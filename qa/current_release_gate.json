@@ -1,0 +1,18 @@
+{
+  "release": "RMW-VS1 1.0 INTERNAL",
+  "decision": "NO-GO",
+  "evaluated_on": "2026-08-13",
+  "source_status": "T001-T072 source/scaffolding prepared",
+  "blocking_evidence": [
+    "Flutter/Dart compile not executed in this environment",
+    "Automated Flutter test suite not executed in this environment",
+    "Android real-device QA not executed",
+    "iOS real-device QA not executed",
+    "TalkBack/VoiceOver QA not executed",
+    "Real Greek speech benchmark not executed",
+    "Final Greek native-reviewed audio/content approval not evidenced"
+  ],
+  "tasks": {"source_prepared": 72, "verified_done": 0, "total": 72},
+  "golden_journeys": {"passed": 0, "mandatory": 46, "status": "NOT_RUN"},
+  "gate_rule": "Missing execution evidence is NOT_RUN and therefore NO-GO."
+}
