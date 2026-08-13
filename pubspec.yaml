@@ -1,0 +1,33 @@
+name: reise_mit_worten
+description: Reise mit Worten - RMW-VS1 foundation starter
+publish_to: 'none'
+version: 0.9.0+9
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path: ^1.9.0
+  sqflite: ^2.4.1
+  uuid: ^4.5.1
+  audioplayers: ^6.8.1
+  speech_to_text: ^7.4.0
+  permission_handler: ^13.0.1
+  crypto: ^3.0.7
+  connectivity_plus: ^7.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  sqflite_common_ffi: ^2.3.4+4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/content/
+    - assets/audio/
