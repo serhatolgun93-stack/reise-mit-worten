@@ -46,7 +46,7 @@ jobs:
         run: python3 scripts/ci_release_gate_precheck.py
 
       - name: Bootstrap Android/iOS runners if missing
-        run: ./scripts/bootstrap_platforms.sh
+        run: bash scripts/bootstrap_platforms.sh
 
       - name: Resolve dependencies
         run: flutter pub get
@@ -100,7 +100,7 @@ jobs:
         run: python3 scripts/ci_release_gate_precheck.py
 
       - name: Bootstrap Android/iOS runners if missing
-        run: ./scripts/bootstrap_platforms.sh
+        run: bash scripts/bootstrap_platforms.sh
 
       - name: Resolve dependencies
         run: flutter pub get
