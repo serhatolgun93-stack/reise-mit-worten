@@ -1,7 +1,7 @@
 name: reise_mit_worten
 description: Reise mit Worten - RMW-VS1 foundation starter
 publish_to: 'none'
-version: 0.9.3+12
+version: 0.9.4+13
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
