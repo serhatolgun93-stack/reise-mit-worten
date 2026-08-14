@@ -24,51 +24,128 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   static const _labels = <String>['English', 'Türkçe', 'Ελληνικά'];
+  static const _subtitles = <String>['London · United Kingdom', 'İstanbul · Türkiye', 'Santorini · Ελλάδα'];
+  static const _flags = <String>['🇬🇧', '🇹🇷', '🇬🇷'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final w = constraints.maxWidth;
-          final h = constraints.maxHeight;
-
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                child: Image.asset(
-                  _assets[_selectedIndex],
-                  key: ValueKey(_selectedIndex),
-                  width: w,
-                  height: h,
-                  fit: BoxFit.fill,
-                  filterQuality: FilterQuality.medium,
-                ),
+      backgroundColor: const Color(0xFF07070B),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 450),
+            child: Image.asset(
+              _assets[_selectedIndex],
+              key: ValueKey(_selectedIndex),
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.medium,
+              errorBuilder: (_, __, ___) => const _FallbackBackground(),
+            ),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x55000000),
+                  Color(0x88000000),
+                  Color(0xF207070B),
+                ],
+                stops: [0.0, 0.48, 1.0],
               ),
-              _TapZone(top: h * 0.515, left: w * 0.045, width: w * 0.91, height: h * 0.078, semanticLabel: 'Englisch auswählen', onTap: () => _select(0)),
-              _TapZone(top: h * 0.605, left: w * 0.045, width: w * 0.91, height: h * 0.078, semanticLabel: 'Türkisch auswählen', onTap: () => _select(1)),
-              _TapZone(top: h * 0.690, left: w * 0.045, width: w * 0.91, height: h * 0.082, semanticLabel: 'Griechisch auswählen', onTap: () => _select(2)),
-              _TapZone(top: h * 0.785, left: w * 0.045, width: w * 0.91, height: h * 0.075, semanticLabel: 'Reise beginnen', onTap: _beginJourney),
-              if (widget.showBuildLabel)
-                Positioned(
-                  right: 8,
-                  bottom: 6,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: const Color(0xAA000000), borderRadius: BorderRadius.circular(8)),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                      child: Text('0.9.5 Foto-Preview', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 9)),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(
+                    child: Text(
+                      'Reise mit Worten',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 29,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.7,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+                  const SizedBox(height: 3),
+                  const Center(
+                    child: Text(
+                      'Deine Reise beginnt mit einem Wort.',
+                      style: TextStyle(color: Color(0xFFD8D8DE), fontSize: 14),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    'Willkommen 👋',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.98),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Welche Sprache möchtest du heute erleben?',
+                    style: TextStyle(color: Color(0xFFE1E1E7), fontSize: 15),
+                  ),
+                  const SizedBox(height: 18),
+                  for (var i = 0; i < _labels.length; i++) ...[
+                    _LanguageCard(
+                      flag: _flags[i],
+                      label: _labels[i],
+                      subtitle: _subtitles[i],
+                      selected: i == _selectedIndex,
+                      onTap: () => _select(i),
+                    ),
+                    if (i != _labels.length - 1) const SizedBox(height: 10),
+                  ],
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 58,
+                    child: FilledButton(
+                      onPressed: _beginJourney,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF2E9A),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Reise beginnen', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_rounded),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 17),
+                  const _FeatureRow(icon: Icons.route_rounded, title: 'Kapitelweise lernen'),
+                  const SizedBox(height: 9),
+                  const _FeatureRow(icon: Icons.picture_as_pdf_rounded, title: 'PDFs & Übungen'),
+                  const SizedBox(height: 9),
+                  const _FeatureRow(icon: Icons.workspace_premium_rounded, title: 'Sprach-Reisepass & Zertifikate'),
+                  if (widget.showBuildLabel) ...[
+                    const SizedBox(height: 10),
+                    const Align(
+                      alignment: Alignment.centerRight,
+                      child: Text('0.9.5+17 UI-Fallback', style: TextStyle(color: Color(0x88FFFFFF), fontSize: 9)),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -80,41 +157,110 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _beginJourney() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Deine Reise in ${_labels[_selectedIndex]} beginnt.'), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text('Deine Reise in ${_labels[_selectedIndex]} beginnt.'),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 }
 
-class _TapZone extends StatelessWidget {
-  final double top;
-  final double left;
-  final double width;
-  final double height;
-  final String semanticLabel;
-  final VoidCallback onTap;
-
-  const _TapZone({required this.top, required this.left, required this.width, required this.height, required this.semanticLabel, required this.onTap});
+class _FallbackBackground extends StatelessWidget {
+  const _FallbackBackground();
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      left: left,
-      width: width,
-      height: height,
-      child: Semantics(
-        button: true,
-        label: semanticLabel,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            splashColor: const Color(0x33FF2E9A),
-            highlightColor: const Color(0x22FF2E9A),
-            borderRadius: BorderRadius.circular(18),
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF251027), Color(0xFF0A0B14), Color(0xFF160716)],
+        ),
+      ),
+      child: Center(
+        child: Icon(Icons.flight_takeoff_rounded, size: 92, color: Color(0x33FF2E9A)),
+      ),
+    );
+  }
+}
+
+class _LanguageCard extends StatelessWidget {
+  final String flag;
+  final String label;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LanguageCard({
+    required this.flag,
+    required this.label,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(17),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xDD2A1024) : const Color(0xBB17171D),
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(
+              color: selected ? const Color(0xFFFF2E9A) : const Color(0x445F5F69),
+              width: selected ? 1.5 : 1,
+            ),
+            boxShadow: selected
+                ? const [BoxShadow(color: Color(0x44FF2E9A), blurRadius: 18, spreadRadius: 1)]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 25)),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: const TextStyle(color: Color(0xFFB7B7C0), fontSize: 11.5)),
+                  ],
+                ),
+              ),
+              Icon(
+                selected ? Icons.check_circle_rounded : Icons.chevron_right_rounded,
+                color: selected ? const Color(0xFFFF2E9A) : const Color(0xFFB7B7C0),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FeatureRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
+  const _FeatureRow({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 19, color: const Color(0xFFFF2E9A)),
+        const SizedBox(width: 10),
+        Text(title, style: const TextStyle(color: Color(0xFFE3E3E8), fontSize: 13.5, fontWeight: FontWeight.w600)),
+      ],
     );
   }
 }
