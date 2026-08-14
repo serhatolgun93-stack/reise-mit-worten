@@ -54,31 +54,66 @@ jobs:
       - name: Unit and widget tests
         run: flutter test --reporter expanded
 
-      - name: Android release install build
+      - name: Android universal release install build
         run: flutter build apk --release
 
-      - name: Verify APK signature
+      - name: Preserve universal APK
         shell: bash
         run: |
           set -euo pipefail
-          APK=build/app/outputs/flutter-apk/app-release.apk
-          test -f "$APK"
-          APKSIGNER=$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1 || true)
-          if [[ -n "$APKSIGNER" ]]; then
-            "$APKSIGNER" verify --verbose "$APK"
-          else
-            echo "WARNING: apksigner not found; APK existence verified only."
-          fi
-          sha256sum "$APK" | tee qa/android_release_apk_sha256.txt
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/rmw-universal-release.apk
 
-      - name: Upload Android install APK and QA inputs
+      - name: Android ARM64 release install build
+        run: flutter build apk --release --target-platform android-arm64
+
+      - name: Preserve ARM64 APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/rmw-arm64-release.apk
+
+      - name: Android package diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa/build_logs
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          AAPT=$(find "$SDK_ROOT/build-tools" -type f -name aapt | sort -V | tail -1 || true)
+          APKSIGNER=$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -1 || true)
+          : > qa/build_logs/android_install_diagnostics.txt
+          for APK in build/app/outputs/flutter-apk/rmw-universal-release.apk build/app/outputs/flutter-apk/rmw-arm64-release.apk; do
+            echo "===== $APK =====" | tee -a qa/build_logs/android_install_diagnostics.txt
+            sha256sum "$APK" | tee -a qa/build_logs/android_install_diagnostics.txt
+            if [[ -n "$AAPT" ]]; then
+              "$AAPT" dump badging "$APK" | grep -E "^(package:|sdkVersion:|targetSdkVersion:|native-code:)" | tee -a qa/build_logs/android_install_diagnostics.txt
+            fi
+            if [[ -n "$APKSIGNER" ]]; then
+              "$APKSIGNER" verify --verbose --print-certs "$APK" | tee -a qa/build_logs/android_install_diagnostics.txt
+            fi
+          done
+
+      - name: Verify APK signatures
+        shell: bash
+        run: |
+          set -euo pipefail
+          APKSIGNER=$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1 || true)
+          for APK in build/app/outputs/flutter-apk/rmw-universal-release.apk build/app/outputs/flutter-apk/rmw-arm64-release.apk; do
+            test -f "$APK"
+            if [[ -n "$APKSIGNER" ]]; then
+              "$APKSIGNER" verify --verbose "$APK"
+            fi
+          done
+          sha256sum build/app/outputs/flutter-apk/rmw-universal-release.apk build/app/outputs/flutter-apk/rmw-arm64-release.apk | tee qa/android_release_apk_sha256.txt
+
+      - name: Upload Android install APKs and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rmw-vs1-android-install
           if-no-files-found: error
           path: |
-            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/flutter-apk/rmw-universal-release.apk
+            build/app/outputs/flutter-apk/rmw-arm64-release.apk
             qa/*.json
             qa/*.md
             qa/*.txt
