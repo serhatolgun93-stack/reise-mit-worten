@@ -26,17 +26,17 @@ from pathlib import Path
 p = Path('android/app/build.gradle.kts')
 s = p.read_text(encoding='utf-8')
 s = s.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 37')
-s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.preview2"')
-s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.preview2"')
+s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.photo095test"')
+s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.photo095test"')
 p.write_text(s, encoding='utf-8')
 PY
 fi
 
 if [[ -f android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt ]]; then
-  mkdir -p android/app/src/main/kotlin/de/reisemitworten/preview2
-  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.preview2/' \
+  mkdir -p android/app/src/main/kotlin/de/reisemitworten/photo095test
+  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.photo095test/' \
     android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt \
-    > android/app/src/main/kotlin/de/reisemitworten/preview2/MainActivity.kt
+    > android/app/src/main/kotlin/de/reisemitworten/photo095test/MainActivity.kt
   rm -rf android/app/src/main/kotlin/com
 fi
 
@@ -45,7 +45,7 @@ if [[ -f android/app/src/main/AndroidManifest.xml ]]; then
 from pathlib import Path
 p = Path('android/app/src/main/AndroidManifest.xml')
 s = p.read_text(encoding='utf-8')
-s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Preview 2"')
+s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Foto Test"')
 p.write_text(s, encoding='utf-8')
 PY
 fi
