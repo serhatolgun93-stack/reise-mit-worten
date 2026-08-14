@@ -1,0 +1,2 @@
+import 'package:flutter/material.dart';
+class RecoveryScreen extends StatelessWidget { final String errorCode; const RecoveryScreen({super.key,required this.errorCode}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Reise mit Worten')),body:Padding(padding:const EdgeInsets.all(24),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[const Text('Die App konnte ihre lokalen Daten nicht korrekt öffnen.'),const SizedBox(height:12),Text('Fehlercode: $errorCode')]))); }
