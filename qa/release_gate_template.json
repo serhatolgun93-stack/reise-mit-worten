@@ -1,0 +1,20 @@
+{
+  "release": "RMW-VS1 1.0 INTERNAL",
+  "decision": "NO-GO",
+  "reason": "Template defaults to NO-GO until all evidence is supplied.",
+  "tasks": {"done": 0, "total": 72},
+  "golden_journeys": {"passed": 0, "mandatory": 46},
+  "defects": {"blocker": 0, "critical": 0, "major": 0, "minor": 0, "cosmetic": 0},
+  "gates": {
+    "ANDROID_DEVICE_QA": "NOT_RUN",
+    "IOS_DEVICE_QA": "NOT_RUN",
+    "CONTENT_APPROVAL": "NOT_RUN",
+    "SECURITY": "NOT_RUN",
+    "PRIVACY": "NOT_RUN",
+    "ACCESSIBILITY": "NOT_RUN",
+    "OFFLINE": "NOT_RUN",
+    "LEARNING_INTEGRITY": "NOT_RUN",
+    "STORY_INTEGRITY": "NOT_RUN",
+    "PERSONAL_SYSTEMS": "NOT_RUN"
+  }
+}
