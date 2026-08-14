@@ -1,0 +1,7 @@
+{
+  "suite": "RMW-VS1 1.0 INTERNAL",
+  "mandatory_count": 46,
+  "execution_rule": "Every mandatory journey must be PASS. NOT_RUN, FAILED or BLOCKED is NO-GO.",
+  "real_device_required": ["GJ-23", "GJ-28", "GJ-33", "GJ-34", "GJ-35", "GJ-36", "GJ-37"],
+  "notes": "Automated tests do not substitute for microphone, VoiceOver/TalkBack, network switching or real device lifecycle QA."
+}
