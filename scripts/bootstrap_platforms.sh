@@ -13,6 +13,8 @@ if [[ ! -d android || ! -d ios ]]; then
     echo "NOTE: flutter create changed pubspec.yaml. Review the diff before committing."
   fi
   rm -f pubspec.yaml.before_flutter_create
+  # flutter create adds a default MyApp widget test that does not belong to RMW.
+  rm -f test/widget_test.dart
 else
   echo "Android/iOS runners already exist."
 fi
