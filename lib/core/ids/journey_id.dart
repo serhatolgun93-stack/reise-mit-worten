@@ -1,5 +1,5 @@
 import 'typed_id.dart';
 
 final class JourneyId extends TypedId {
-  JourneyId(String value) : super._(TypedId.validate(value, 'JourneyId'));
+  JourneyId(String value) : super.validated(TypedId.validate(value, 'JourneyId'));
 }
