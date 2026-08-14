@@ -1,0 +1,2 @@
+import 'dart:convert';
+final class ArtifactSnapshot { final String id; final String journeyInstanceId; final String artifactId; final String unlockEventId; final int version; final Map<String,Object?> payload; final DateTime createdAt; const ArtifactSnapshot({required this.id,required this.journeyInstanceId,required this.artifactId,required this.unlockEventId,required this.version,required this.payload,required this.createdAt}); String get itemId=>payload['item_id'] as String? ?? ''; String encodePayload()=>jsonEncode(payload); }
