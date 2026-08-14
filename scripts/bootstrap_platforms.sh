@@ -15,32 +15,48 @@ if [[ ! -d android || ! -d ios ]]; then
     echo "NOTE: flutter create changed pubspec.yaml. Review the diff before committing."
   fi
   rm -f pubspec.yaml.before_flutter_create
-  # flutter create adds a default MyApp widget test that does not belong to RMW.
   rm -f test/widget_test.dart
 else
   echo "Android/iOS runners already exist."
 fi
 
-# permission_handler_android currently requires compileSdk 37.
-# Keep targetSdk/minSdk managed by Flutter; only raise compileSdk.
 if [[ -f android/app/build.gradle.kts ]]; then
   python3 - <<'PY'
 from pathlib import Path
 p = Path('android/app/build.gradle.kts')
 s = p.read_text(encoding='utf-8')
 s = s.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 37')
+s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.vs1"')
+s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.vs1"')
 p.write_text(s, encoding='utf-8')
 PY
 fi
 
-# AGP 9.0.1 reports SDK 37 as newer than its recommended maximum (36),
-# but compileSdk is backward compatible and required by the plugin metadata.
+# Keep the generated Kotlin activity package aligned with the new namespace.
+if [[ -f android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt ]]; then
+  mkdir -p android/app/src/main/kotlin/de/reisemitworten/vs1
+  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.vs1/' \
+    android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt \
+    > android/app/src/main/kotlin/de/reisemitworten/vs1/MainActivity.kt
+  rm -rf android/app/src/main/kotlin/com
+fi
+
+# Give the generated app a stable visible name for device testing.
+if [[ -f android/app/src/main/AndroidManifest.xml ]]; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path('android/app/src/main/AndroidManifest.xml')
+s = p.read_text(encoding='utf-8')
+s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten VS1"')
+p.write_text(s, encoding='utf-8')
+PY
+fi
+
 if [[ -f android/gradle.properties ]]; then
   grep -q '^android.suppressUnsupportedCompileSdk=37$' android/gradle.properties || \
     printf '\nandroid.suppressUnsupportedCompileSdk=37\n' >> android/gradle.properties
 fi
 
-# Ensure the required Android platform is installed on GitHub-hosted runners.
 if command -v sdkmanager >/dev/null 2>&1; then
   yes | sdkmanager --licenses >/dev/null 2>&1 || true
   sdkmanager 'platforms;android-37'
