@@ -1,0 +1,93 @@
+{
+  "suite": "RMW-VS1 1.0 INTERNAL",
+  "status": "DRAFT_FOR_EXECUTION",
+  "rule": "Every mandatory journey must be PASS. NOT_RUN, FAILED or BLOCKED keeps release at NO-GO.",
+  "journeys": [
+    {
+      "id": "GJ-01",
+      "title": "Cold start opens app successfully",
+      "platforms": ["android", "ios"],
+      "real_device_required": false,
+      "preconditions": ["Fresh app launch", "No forced network condition"],
+      "steps": [
+        "Launch Reise mit Worten from the device home screen.",
+        "Observe the first rendered app screen.",
+        "Wait 10 seconds without interaction."
+      ],
+      "expected": [
+        "App does not crash or close unexpectedly.",
+        "A valid RMW screen is visible.",
+        "No unrecoverable error screen is shown."
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GJ-02",
+      "title": "App can be backgrounded and resumed",
+      "platforms": ["android", "ios"],
+      "real_device_required": false,
+      "preconditions": ["GJ-01 passed"],
+      "steps": [
+        "Send the app to the background.",
+        "Wait 5 seconds.",
+        "Return to Reise mit Worten."
+      ],
+      "expected": [
+        "App resumes without crash.",
+        "Previously visible state remains coherent."
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GJ-03",
+      "title": "App survives process restart",
+      "platforms": ["android", "ios"],
+      "real_device_required": false,
+      "preconditions": ["GJ-01 passed"],
+      "steps": [
+        "Close the app completely.",
+        "Launch Reise mit Worten again."
+      ],
+      "expected": [
+        "App starts successfully after restart.",
+        "No corrupt-state or migration failure is shown."
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GJ-04",
+      "title": "Home screen primary actions are reachable",
+      "platforms": ["android", "ios"],
+      "real_device_required": false,
+      "preconditions": ["App launched successfully"],
+      "steps": [
+        "Inspect the primary screen.",
+        "Tap each visible primary navigation action once and return where possible."
+      ],
+      "expected": [
+        "No primary action causes a crash.",
+        "Navigation remains reversible and coherent."
+      ],
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GJ-05",
+      "title": "No-network cold start is recoverable",
+      "platforms": ["android", "ios"],
+      "real_device_required": false,
+      "preconditions": ["Disable Wi-Fi and mobile data before launch"],
+      "steps": [
+        "Launch Reise mit Worten with the device offline.",
+        "Observe startup behavior.",
+        "Re-enable network connectivity."
+      ],
+      "expected": [
+        "App does not crash while offline.",
+        "Offline or recoverable state is understandable.",
+        "App can continue or recover after network returns."
+      ],
+      "status": "NOT_RUN"
+    }
+  ],
+  "remaining_catalog": "GJ-06..GJ-46 to be expanded before execution; GJ-23, GJ-28, GJ-33, GJ-34, GJ-35, GJ-36 and GJ-37 remain mandatory real-device journeys per golden_journey_matrix.json."
+}
