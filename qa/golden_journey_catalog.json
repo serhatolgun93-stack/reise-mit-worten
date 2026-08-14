@@ -1,93 +1,55 @@
 {
   "suite": "RMW-VS1 1.0 INTERNAL",
-  "status": "DRAFT_FOR_EXECUTION",
+  "status": "READY_FOR_EXECUTION",
   "rule": "Every mandatory journey must be PASS. NOT_RUN, FAILED or BLOCKED keeps release at NO-GO.",
   "journeys": [
-    {
-      "id": "GJ-01",
-      "title": "Cold start opens app successfully",
-      "platforms": ["android", "ios"],
-      "real_device_required": false,
-      "preconditions": ["Fresh app launch", "No forced network condition"],
-      "steps": [
-        "Launch Reise mit Worten from the device home screen.",
-        "Observe the first rendered app screen.",
-        "Wait 10 seconds without interaction."
-      ],
-      "expected": [
-        "App does not crash or close unexpectedly.",
-        "A valid RMW screen is visible.",
-        "No unrecoverable error screen is shown."
-      ],
-      "status": "NOT_RUN"
-    },
-    {
-      "id": "GJ-02",
-      "title": "App can be backgrounded and resumed",
-      "platforms": ["android", "ios"],
-      "real_device_required": false,
-      "preconditions": ["GJ-01 passed"],
-      "steps": [
-        "Send the app to the background.",
-        "Wait 5 seconds.",
-        "Return to Reise mit Worten."
-      ],
-      "expected": [
-        "App resumes without crash.",
-        "Previously visible state remains coherent."
-      ],
-      "status": "NOT_RUN"
-    },
-    {
-      "id": "GJ-03",
-      "title": "App survives process restart",
-      "platforms": ["android", "ios"],
-      "real_device_required": false,
-      "preconditions": ["GJ-01 passed"],
-      "steps": [
-        "Close the app completely.",
-        "Launch Reise mit Worten again."
-      ],
-      "expected": [
-        "App starts successfully after restart.",
-        "No corrupt-state or migration failure is shown."
-      ],
-      "status": "NOT_RUN"
-    },
-    {
-      "id": "GJ-04",
-      "title": "Home screen primary actions are reachable",
-      "platforms": ["android", "ios"],
-      "real_device_required": false,
-      "preconditions": ["App launched successfully"],
-      "steps": [
-        "Inspect the primary screen.",
-        "Tap each visible primary navigation action once and return where possible."
-      ],
-      "expected": [
-        "No primary action causes a crash.",
-        "Navigation remains reversible and coherent."
-      ],
-      "status": "NOT_RUN"
-    },
-    {
-      "id": "GJ-05",
-      "title": "No-network cold start is recoverable",
-      "platforms": ["android", "ios"],
-      "real_device_required": false,
-      "preconditions": ["Disable Wi-Fi and mobile data before launch"],
-      "steps": [
-        "Launch Reise mit Worten with the device offline.",
-        "Observe startup behavior.",
-        "Re-enable network connectivity."
-      ],
-      "expected": [
-        "App does not crash while offline.",
-        "Offline or recoverable state is understandable.",
-        "App can continue or recover after network returns."
-      ],
-      "status": "NOT_RUN"
-    }
+    {"id":"GJ-01","title":"Cold start","area":"lifecycle","real_device_required":false,"check":"Launch app; valid RMW screen appears; no crash or unrecoverable error.","status":"NOT_RUN"},
+    {"id":"GJ-02","title":"Background and resume","area":"lifecycle","real_device_required":false,"check":"Background app for 5 seconds and resume; state remains coherent.","status":"NOT_RUN"},
+    {"id":"GJ-03","title":"Process restart","area":"lifecycle","real_device_required":false,"check":"Close app completely and relaunch; app starts without corrupt-state or migration error.","status":"NOT_RUN"},
+    {"id":"GJ-04","title":"Primary navigation","area":"navigation","real_device_required":false,"check":"Open each visible primary navigation action; no crash and navigation is reversible.","status":"NOT_RUN"},
+    {"id":"GJ-05","title":"Offline cold start","area":"offline","real_device_required":false,"check":"Launch without network; app remains usable or explains recoverable offline state.","status":"NOT_RUN"},
+    {"id":"GJ-06","title":"Create local profile","area":"profile","real_device_required":false,"check":"Create a local profile and confirm it is available after navigation away and back.","status":"NOT_RUN"},
+    {"id":"GJ-07","title":"Profile persistence","area":"profile","real_device_required":false,"check":"Restart app after profile creation; same local profile is restored.","status":"NOT_RUN"},
+    {"id":"GJ-08","title":"Start journey","area":"journey","real_device_required":false,"check":"Start a journey; JourneyInstance is created and first stage/scene becomes visible.","status":"NOT_RUN"},
+    {"id":"GJ-09","title":"Journey checkpoint","area":"journey","real_device_required":false,"check":"Progress to a checkpoint; leave and resume; correct checkpoint is restored.","status":"NOT_RUN"},
+    {"id":"GJ-10","title":"Dialogue scene","area":"content","real_device_required":false,"check":"Open dialogue content; target-language text renders correctly and scene can advance.","status":"NOT_RUN"},
+    {"id":"GJ-11","title":"Choice scene","area":"content","real_device_required":false,"check":"Choose an available answer; only the selected transition is applied.","status":"NOT_RUN"},
+    {"id":"GJ-12","title":"Text input scene","area":"content","real_device_required":false,"check":"Enter text and submit; input is accepted/rejected deterministically without crash.","status":"NOT_RUN"},
+    {"id":"GJ-13","title":"Listening scene","area":"audio","real_device_required":false,"check":"Play learning audio; playback state is visible and repeated play does not duplicate or crash.","status":"NOT_RUN"},
+    {"id":"GJ-14","title":"Audio stop and replay","area":"audio","real_device_required":false,"check":"Stop audio and replay; controller returns to a consistent state.","status":"NOT_RUN"},
+    {"id":"GJ-15","title":"Content validation failure","area":"content","real_device_required":false,"check":"Invalid/missing content produces controlled recovery behavior rather than a crash.","status":"NOT_RUN"},
+    {"id":"GJ-16","title":"Story event projection","area":"story","real_device_required":false,"check":"Complete an interaction that emits a story event; projection reflects it once.","status":"NOT_RUN"},
+    {"id":"GJ-17","title":"Story projection rebuild","area":"story","real_device_required":false,"check":"Rebuild projection from stored events; resulting state matches pre-rebuild state.","status":"NOT_RUN"},
+    {"id":"GJ-18","title":"Evidence creation","area":"evidence","real_device_required":false,"check":"Complete evidence-generating interaction; evidence event is persisted once.","status":"NOT_RUN"},
+    {"id":"GJ-19","title":"Atomic interaction commit","area":"integrity","real_device_required":false,"check":"Commit interaction; journey/story/evidence changes are all visible together and not partially applied.","status":"NOT_RUN"},
+    {"id":"GJ-20","title":"Duplicate commit protection","area":"integrity","real_device_required":false,"check":"Repeat same interaction commit identifier; state is not duplicated.","status":"NOT_RUN"},
+    {"id":"GJ-21","title":"Language book projection","area":"personal_systems","real_device_required":false,"check":"Earn a language-book item; personal language book shows the projected entry.","status":"NOT_RUN"},
+    {"id":"GJ-22","title":"Passport projection","area":"personal_systems","real_device_required":false,"check":"Complete qualifying evidence; language passport reflects the expected progress entry.","status":"NOT_RUN"},
+    {"id":"GJ-23","title":"Microphone permission and speech capture","area":"speech","real_device_required":true,"check":"On a real device request microphone permission, record a speech attempt and receive a controlled result.","status":"NOT_RUN"},
+    {"id":"GJ-24","title":"Speech denied fallback","area":"speech","real_device_required":false,"check":"Deny microphone permission; app offers speech-free route/help and remains usable.","status":"NOT_RUN"},
+    {"id":"GJ-25","title":"Speech unavailable fallback","area":"speech","real_device_required":false,"check":"Simulate unavailable recognizer; app selects deterministic speech-free route.","status":"NOT_RUN"},
+    {"id":"GJ-26","title":"Greek semantic evaluation","area":"speech","real_device_required":false,"check":"Evaluate controlled Greek input; accepted/rejected outcome matches configured semantic rules.","status":"NOT_RUN"},
+    {"id":"GJ-27","title":"Speech attempt commit","area":"speech","real_device_required":false,"check":"Successful speech evaluation commits progress/evidence exactly once.","status":"NOT_RUN"},
+    {"id":"GJ-28","title":"Real Greek speech recognition","area":"speech","real_device_required":true,"check":"On a real device speak the prescribed Greek phrases; recognition/evaluation completes and results are recorded.","status":"NOT_RUN"},
+    {"id":"GJ-29","title":"Network loss during journey","area":"offline","real_device_required":false,"check":"Lose network while in a journey; local state remains coherent and user can continue where designed.","status":"NOT_RUN"},
+    {"id":"GJ-30","title":"Network restoration","area":"offline","real_device_required":false,"check":"Restore network after offline state; app recovers without duplicate progress or restart requirement.","status":"NOT_RUN"},
+    {"id":"GJ-31","title":"Artifact snapshot","area":"personal_systems","real_device_required":false,"check":"Create an artifact snapshot; snapshot contains stable claims and can be read again.","status":"NOT_RUN"},
+    {"id":"GJ-32","title":"Help sheet access","area":"accessibility","real_device_required":false,"check":"Open contextual help from supported interaction; help is readable and dismissible without losing progress.","status":"NOT_RUN"},
+    {"id":"GJ-33","title":"Android lifecycle real device","area":"lifecycle","real_device_required":true,"check":"On Android: launch, background, resume, force-close and relaunch; no data loss or crash.","status":"NOT_RUN"},
+    {"id":"GJ-34","title":"iOS lifecycle real device","area":"lifecycle","real_device_required":true,"check":"On iPhone: launch, background, resume, terminate and relaunch; no data loss or crash.","status":"NOT_RUN"},
+    {"id":"GJ-35","title":"TalkBack navigation","area":"accessibility","real_device_required":true,"check":"On Android with TalkBack, traverse primary screens and activate primary actions with understandable labels/order.","status":"NOT_RUN"},
+    {"id":"GJ-36","title":"VoiceOver navigation","area":"accessibility","real_device_required":true,"check":"On iPhone with VoiceOver, traverse primary screens and activate primary actions with understandable labels/order.","status":"NOT_RUN"},
+    {"id":"GJ-37","title":"Real device network switching","area":"offline","real_device_required":true,"check":"During use switch Wi-Fi/mobile data/offline and back; app remains coherent and recovers without duplicate state.","status":"NOT_RUN"},
+    {"id":"GJ-38","title":"Reduced motion policy","area":"accessibility","real_device_required":false,"check":"Enable reduced-motion preference; nonessential motion is reduced while interactions remain understandable.","status":"NOT_RUN"},
+    {"id":"GJ-39","title":"Large text resilience","area":"accessibility","real_device_required":false,"check":"Use enlarged system text; primary content/actions remain readable and reachable without critical clipping.","status":"NOT_RUN"},
+    {"id":"GJ-40","title":"Migration from empty database","area":"database","real_device_required":false,"check":"Fresh database applies all migrations and app boots normally.","status":"NOT_RUN"},
+    {"id":"GJ-41","title":"Migration with existing local state","area":"database","real_device_required":false,"check":"Upgrade representative existing database; profile/journey/story data remains readable.","status":"NOT_RUN"},
+    {"id":"GJ-42","title":"Character knowledge persistence","area":"story","real_device_required":false,"check":"Create a character fact; restart/reload and verify the fact remains projected once.","status":"NOT_RUN"},
+    {"id":"GJ-43","title":"Error recovery screen","area":"recovery","real_device_required":false,"check":"Trigger controlled bootstrap/content error; recovery UI appears and retry/back path works.","status":"NOT_RUN"},
+    {"id":"GJ-44","title":"No duplicate evidence after retry","area":"integrity","real_device_required":false,"check":"Retry an interrupted interaction; evidence/story/progress are not duplicated.","status":"NOT_RUN"},
+    {"id":"GJ-45","title":"End-to-end beginner lesson","area":"end_to_end","real_device_required":false,"check":"From app start complete one representative beginner lesson through content, interaction, evidence and personal-system projection.","status":"NOT_RUN"},
+    {"id":"GJ-46","title":"End-to-end resume and completion","area":"end_to_end","real_device_required":false,"check":"Start a representative lesson, leave app, resume, finish and confirm final progress is persisted once.","status":"NOT_RUN"}
   ],
-  "remaining_catalog": "GJ-06..GJ-46 to be expanded before execution; GJ-23, GJ-28, GJ-33, GJ-34, GJ-35, GJ-36 and GJ-37 remain mandatory real-device journeys per golden_journey_matrix.json."
+  "real_device_required": ["GJ-23","GJ-28","GJ-33","GJ-34","GJ-35","GJ-36","GJ-37"],
+  "summary": {"mandatory":46,"pass":0,"failed":0,"blocked":0,"not_run":46}
 }
