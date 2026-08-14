@@ -1,6 +1,6 @@
 abstract class TypedId {
   final String value;
-  const TypedId._(this.value);
+  const TypedId.validated(this.value);
 
   static String validate(String value, String typeName) {
     final normalized = value.trim();
