@@ -1,0 +1,21 @@
+{
+  "artifact": "RMW-VS1 1.0 INTERNAL",
+  "source_tasks": "T001-T072 prepared",
+  "static_preflight": "PASS",
+  "flutter_sdk_in_current_environment": "NOT_AVAILABLE",
+  "flutter_analyze": "NOT_RUN",
+  "flutter_test": "NOT_RUN",
+  "android_runner": "MISSING_UNTIL_FLUTTER_CREATE",
+  "ios_runner": "MISSING_UNTIL_FLUTTER_CREATE",
+  "android_build": "NOT_RUN",
+  "ios_build": "NOT_RUN",
+  "real_device_qa": "NOT_RUN",
+  "release_decision": "NO-GO",
+  "ci_build_gate": "CONFIGURED",
+  "ci_flutter_version": "3.44.7",
+  "ci_release_gate_precheck": "PASS",
+  "ci_flutter_analyze": "NOT_RUN",
+  "ci_flutter_test": "NOT_RUN",
+  "ci_android_build": "NOT_RUN",
+  "ci_ios_build": "NOT_RUN"
+}
