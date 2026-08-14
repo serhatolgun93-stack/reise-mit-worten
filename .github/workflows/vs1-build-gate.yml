@@ -1,0 +1,120 @@
+name: RMW VS1 Build Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmw-vs1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.44.7
+  FLUTTER_HOME: ${{ github.workspace }}/.flutter-sdk
+
+jobs:
+  analyze-test-android:
+    name: Analyze, test, Android debug build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter SDK (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "${FLUTTER_VERSION}" https://github.com/flutter/flutter.git "${FLUTTER_HOME}"
+          echo "${FLUTTER_HOME}/bin" >> "$GITHUB_PATH"
+
+      - name: Flutter version and doctor
+        shell: bash
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      - name: Static source preflight
+        run: python3 scripts/static_preflight.py
+
+      - name: QA catalog precheck
+        run: python3 scripts/ci_release_gate_precheck.py
+
+      - name: Bootstrap Android/iOS runners if missing
+        run: ./scripts/bootstrap_platforms.sh
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Unit and widget tests
+        run: flutter test --reporter expanded
+
+      - name: Android debug build
+        run: flutter build apk --debug
+
+      - name: Upload Android APK and QA inputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmw-vs1-android-and-qa
+          if-no-files-found: warn
+          path: |
+            build/app/outputs/flutter-apk/app-debug.apk
+            qa/*.json
+            qa/*.md
+            qa/build_logs/**
+
+  ios-debug-build:
+    name: iOS unsigned debug build
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter SDK (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "${FLUTTER_VERSION}" https://github.com/flutter/flutter.git "${FLUTTER_HOME}"
+          echo "${FLUTTER_HOME}/bin" >> "$GITHUB_PATH"
+
+      - name: Flutter version and doctor
+        shell: bash
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      - name: Static source preflight
+        run: python3 scripts/static_preflight.py
+
+      - name: QA catalog precheck
+        run: python3 scripts/ci_release_gate_precheck.py
+
+      - name: Bootstrap Android/iOS runners if missing
+        run: ./scripts/bootstrap_platforms.sh
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: iOS unsigned debug build
+        run: flutter build ios --debug --no-codesign
+
+      - name: Upload iOS build logs and QA inputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmw-vs1-ios-qa
+          if-no-files-found: warn
+          path: |
+            qa/*.json
+            qa/*.md
+            qa/build_logs/**
