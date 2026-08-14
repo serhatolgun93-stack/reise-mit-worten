@@ -1,18 +1,26 @@
 {
   "release": "RMW-VS1 1.0 INTERNAL",
   "decision": "NO-GO",
-  "evaluated_on": "2026-08-13",
-  "source_status": "T001-T072 source/scaffolding prepared",
+  "evaluated_on": "2026-08-14",
+  "source_status": "T001-T072 source/scaffolding prepared; CI compile/test/build evidence now available",
+  "verified_ci": {
+    "run_number": 23,
+    "run_id": 31776478518,
+    "head_sha": "ef531a51e3b53c0bdd1a191dc17f5ac4d1231574",
+    "flutter_analyze": "PASS",
+    "flutter_test": "PASS_3_OF_3",
+    "android_debug_build": "PASS",
+    "ios_unsigned_debug_build": "PASS"
+  },
   "blocking_evidence": [
-    "Flutter/Dart compile not executed in this environment",
-    "Automated Flutter test suite not executed in this environment",
     "Android real-device QA not executed",
     "iOS real-device QA not executed",
     "TalkBack/VoiceOver QA not executed",
     "Real Greek speech benchmark not executed",
-    "Final Greek native-reviewed audio/content approval not evidenced"
+    "Final Greek native-reviewed audio/content approval not evidenced",
+    "Golden Journeys GJ-01..GJ-46 not executed end-to-end"
   ],
   "tasks": {"source_prepared": 72, "verified_done": 0, "total": 72},
   "golden_journeys": {"passed": 0, "mandatory": 46, "status": "NOT_RUN"},
-  "gate_rule": "Missing execution evidence is NOT_RUN and therefore NO-GO."
+  "gate_rule": "Missing mandatory execution evidence is NOT_RUN and therefore NO-GO."
 }
