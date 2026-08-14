@@ -35,8 +35,10 @@ if not workflow.exists():
     errors.append('missing .github/workflows/vs1-build-gate.yml')
 else:
     w=workflow.read_text(encoding='utf-8')
-    for required_snippet in ['flutter analyze','flutter test --reporter expanded','flutter build apk --debug','flutter build ios --debug --no-codesign','FLUTTER_VERSION: 3.44.7']:
+    for required_snippet in ['flutter analyze','flutter test --reporter expanded','flutter build ios --debug --no-codesign','FLUTTER_VERSION: 3.44.7']:
         if required_snippet not in w: errors.append(f'CI workflow missing: {required_snippet}')
+    if 'flutter build apk --debug' not in w and 'flutter build apk --release' not in w:
+        errors.append('CI workflow missing an Android APK build command')
 if errors:
     print('CI_RELEASE_GATE_PREFLIGHT: FAIL')
     for e in errors: print(f' - {e}')
