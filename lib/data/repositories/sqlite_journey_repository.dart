@@ -1,5 +1,3 @@
-import 'package:sqflite/sqflite.dart';
-
 import '../../core/ids/interaction_id.dart';
 import '../../core/ids/journey_id.dart';
 import '../../core/ids/journey_instance_id.dart';
