@@ -1,0 +1,30 @@
+{
+  "suite": "RMW-VS1 1.0 INTERNAL",
+  "platform": "android",
+  "build_source": {
+    "workflow_run": 23,
+    "commit": "ef531a51e3b53c0bdd1a191dc17f5ac4d1231574",
+    "artifact": "rmw-vs1-android-and-qa",
+    "apk": "app-debug.apk"
+  },
+  "device": {
+    "manufacturer": "NOT_RECORDED",
+    "model": "NOT_RECORDED",
+    "android_version": "NOT_RECORDED"
+  },
+  "execution_status": "NOT_RUN",
+  "journeys": {
+    "GJ-01": {"status":"NOT_RUN","notes":""},
+    "GJ-02": {"status":"NOT_RUN","notes":""},
+    "GJ-03": {"status":"NOT_RUN","notes":""},
+    "GJ-04": {"status":"NOT_RUN","notes":""},
+    "GJ-05": {"status":"NOT_RUN","notes":""},
+    "GJ-23": {"status":"NOT_RUN","notes":"Real-device mandatory: microphone permission and speech capture"},
+    "GJ-28": {"status":"NOT_RUN","notes":"Real-device mandatory: Greek speech recognition"},
+    "GJ-33": {"status":"NOT_RUN","notes":"Real-device mandatory: Android lifecycle"},
+    "GJ-35": {"status":"NOT_RUN","notes":"Real-device mandatory: TalkBack"},
+    "GJ-37": {"status":"NOT_RUN","notes":"Real-device mandatory: network switching"}
+  },
+  "evidence_rule": "Record PASS/FAILED/BLOCKED plus concise observation. Screenshots or screen recordings should be retained for failures and accessibility/speech cases.",
+  "release_effect": "Any NOT_RUN, FAILED or BLOCKED mandatory journey keeps VS1 at NO-GO."
+}
