@@ -5,9 +5,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const assets = <String>[
-    'assets/screens/english.jpg',
-    'assets/screens/turkish.jpg',
-    'assets/screens/greek.jpg',
+    'assets/backgrounds/english_london.png',
+    'assets/backgrounds/turkish_istanbul.png',
+    'assets/backgrounds/greek_santorini.png',
   ];
 
   for (final asset in assets) {
