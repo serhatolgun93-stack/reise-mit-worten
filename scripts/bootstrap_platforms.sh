@@ -26,17 +26,20 @@ from pathlib import Path
 p = Path('android/app/build.gradle.kts')
 s = p.read_text(encoding='utf-8')
 s = s.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 37')
-s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.photo095test"')
-s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.photo095test"')
+s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.photo095compat"')
+s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.photo095compat"')
+marker = 'android {\n'
+if 'useLegacyPackaging = true' not in s:
+    s = s.replace(marker, marker + '    packaging {\n        jniLibs {\n            useLegacyPackaging = true\n        }\n    }\n', 1)
 p.write_text(s, encoding='utf-8')
 PY
 fi
 
 if [[ -f android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt ]]; then
-  mkdir -p android/app/src/main/kotlin/de/reisemitworten/photo095test
-  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.photo095test/' \
+  mkdir -p android/app/src/main/kotlin/de/reisemitworten/photo095compat
+  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.photo095compat/' \
     android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt \
-    > android/app/src/main/kotlin/de/reisemitworten/photo095test/MainActivity.kt
+    > android/app/src/main/kotlin/de/reisemitworten/photo095compat/MainActivity.kt
   rm -rf android/app/src/main/kotlin/com
 fi
 
@@ -45,7 +48,7 @@ if [[ -f android/app/src/main/AndroidManifest.xml ]]; then
 from pathlib import Path
 p = Path('android/app/src/main/AndroidManifest.xml')
 s = p.read_text(encoding='utf-8')
-s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Foto Test"')
+s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Foto Compat"')
 p.write_text(s, encoding='utf-8')
 PY
 fi
