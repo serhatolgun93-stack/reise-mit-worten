@@ -45,6 +45,31 @@ jobs:
       - name: Bootstrap Android/iOS runners if missing
         run: bash scripts/bootstrap_platforms.sh
 
+      - name: Configure stable preview signing
+        shell: bash
+        env:
+          RMW_PREVIEW_KEYSTORE_B64: ${{ secrets.RMW_PREVIEW_KEYSTORE_B64 }}
+          RMW_PREVIEW_STORE_PASSWORD: ${{ secrets.RMW_PREVIEW_STORE_PASSWORD }}
+          RMW_PREVIEW_KEY_ALIAS: ${{ secrets.RMW_PREVIEW_KEY_ALIAS }}
+          RMW_PREVIEW_KEY_PASSWORD: ${{ secrets.RMW_PREVIEW_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in RMW_PREVIEW_KEYSTORE_B64 RMW_PREVIEW_STORE_PASSWORD RMW_PREVIEW_KEY_ALIAS RMW_PREVIEW_KEY_PASSWORD; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "ERROR: required GitHub Actions secret '$name' is missing." >&2
+              echo "Stable preview APKs are never allowed to fall back to a random runner debug key." >&2
+              exit 3
+            fi
+          done
+          printf '%s' "$RMW_PREVIEW_KEYSTORE_B64" | base64 --decode > android/app/rmw-preview.jks
+          cat > android/key.properties <<EOF
+          storePassword=$RMW_PREVIEW_STORE_PASSWORD
+          keyPassword=$RMW_PREVIEW_KEY_PASSWORD
+          keyAlias=$RMW_PREVIEW_KEY_ALIAS
+          storeFile=rmw-preview.jks
+          EOF
+          chmod 600 android/app/rmw-preview.jks android/key.properties
+
       - name: Resolve dependencies
         run: flutter pub get
 
@@ -121,7 +146,6 @@ jobs:
 
   ios-debug-build:
     name: iOS unsigned debug build
-    needs: analyze-test-android
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
