@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../journey/journey_start_screen.dart';
+import '../journey/journey_intro_flow.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool showBuildLabel;
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '0.9.5+24 journey navigation',
+                            '0.9.5+25 personal intro',
                             style: TextStyle(
                               color: Color(0x88FFFFFF),
                               fontSize: 9,
@@ -219,10 +219,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _beginJourney() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => JourneyStartScreen(
+        builder: (_) => JourneyIntroFlow(
           language: _labels[_selectedIndex],
           flag: _flags[_selectedIndex],
           greeting: _greetings[_selectedIndex],
+          backgroundAsset: _assets[_selectedIndex],
         ),
       ),
     );
