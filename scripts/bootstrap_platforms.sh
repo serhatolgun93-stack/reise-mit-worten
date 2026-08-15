@@ -25,21 +25,39 @@ if [[ -f android/app/build.gradle.kts ]]; then
 from pathlib import Path
 p = Path('android/app/build.gradle.kts')
 s = p.read_text(encoding='utf-8')
+
+# Stable preview identity. Never rotate this for normal test builds.
 s = s.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 37')
-s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.photo095compat"')
-s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.photo095compat"')
+s = s.replace('applicationId = "com.example.reise_mit_worten"', 'applicationId = "de.reisemitworten.preview"')
+s = s.replace('namespace = "com.example.reise_mit_worten"', 'namespace = "de.reisemitworten.preview"')
+
+# Keep native libraries broadly installable on Android devices, including
+# devices using newer page-size requirements.
 marker = 'android {\n'
 if 'useLegacyPackaging = true' not in s:
     s = s.replace(marker, marker + '    packaging {\n        jniLibs {\n            useLegacyPackaging = true\n        }\n    }\n', 1)
+
+# Release signing is intentionally externalized. CI writes android/key.properties
+# and android/app/rmw-preview.jks from encrypted GitHub Actions secrets.
+if 'val rmwKeystoreProperties' not in s:
+    prefix = '''import java.util.Properties\nimport java.io.FileInputStream\n\nval rmwKeystoreProperties = Properties()\nval rmwKeystorePropertiesFile = rootProject.file("key.properties")\nif (rmwKeystorePropertiesFile.exists()) {\n    rmwKeystoreProperties.load(FileInputStream(rmwKeystorePropertiesFile))\n}\n\n'''
+    s = prefix + s
+
+signing_block = '''    signingConfigs {\n        create("rmwPreviewRelease") {\n            if (!rmwKeystorePropertiesFile.exists()) {\n                throw GradleException("Missing android/key.properties for stable preview signing")\n            }\n            keyAlias = rmwKeystoreProperties["keyAlias"] as String\n            keyPassword = rmwKeystoreProperties["keyPassword"] as String\n            storeFile = file(rmwKeystoreProperties["storeFile"] as String)\n            storePassword = rmwKeystoreProperties["storePassword"] as String\n        }\n    }\n'''
+if 'create("rmwPreviewRelease")' not in s:
+    s = s.replace('android {\n', 'android {\n' + signing_block, 1)
+
+s = s.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = signingConfigs.getByName("rmwPreviewRelease")')
+
 p.write_text(s, encoding='utf-8')
 PY
 fi
 
 if [[ -f android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt ]]; then
-  mkdir -p android/app/src/main/kotlin/de/reisemitworten/photo095compat
-  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.photo095compat/' \
+  mkdir -p android/app/src/main/kotlin/de/reisemitworten/preview
+  sed 's/^package com\.example\.reise_mit_worten/package de.reisemitworten.preview/' \
     android/app/src/main/kotlin/com/example/reise_mit_worten/MainActivity.kt \
-    > android/app/src/main/kotlin/de/reisemitworten/photo095compat/MainActivity.kt
+    > android/app/src/main/kotlin/de/reisemitworten/preview/MainActivity.kt
   rm -rf android/app/src/main/kotlin/com
 fi
 
@@ -48,7 +66,7 @@ if [[ -f android/app/src/main/AndroidManifest.xml ]]; then
 from pathlib import Path
 p = Path('android/app/src/main/AndroidManifest.xml')
 s = p.read_text(encoding='utf-8')
-s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Foto Compat"')
+s = s.replace('android:label="reise_mit_worten"', 'android:label="Reise mit Worten Preview"')
 p.write_text(s, encoding='utf-8')
 PY
 fi
