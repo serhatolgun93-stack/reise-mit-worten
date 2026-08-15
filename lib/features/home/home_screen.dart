@@ -37,8 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFF07070B),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final heroHeight = constraints.maxHeight * 0.50;
-          final heroGap = constraints.maxHeight * 0.23;
+          final heroHeight = constraints.maxHeight * 0.42;
+          final heroGap = constraints.maxHeight * 0.25;
 
           return Stack(
             fit: StackFit.expand,
@@ -51,13 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: heroHeight,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 450),
-                  child: Image.asset(
-                    _assets[_selectedIndex],
+                  child: SizedBox.expand(
                     key: ValueKey(_assets[_selectedIndex]),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => const _FallbackBackground(),
+                    child: Image.asset(
+                      _assets[_selectedIndex],
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      filterQuality: FilterQuality.high,
+                      errorBuilder: (_, __, ___) => const _FallbackBackground(),
+                    ),
                   ),
                 ),
               ),
@@ -65,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: heroHeight + 90,
+                height: heroHeight + 70,
                 child: const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -77,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Color(0x9907070B),
                         Color(0xFF07070B),
                       ],
-                      stops: [0.0, 0.48, 0.82, 1.0],
+                      stops: [0.0, 0.52, 0.86, 1.0],
                     ),
                   ),
                 ),
@@ -187,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '0.9.5+22 hero layout',
+                            '0.9.5+23 full-width hero',
                             style: TextStyle(
                               color: Color(0x88FFFFFF),
                               fontSize: 9,
