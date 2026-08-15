@@ -18,9 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 2;
 
   static const _assets = <String>[
-    'assets/screens/english.jpg',
-    'assets/screens/turkish.jpg',
-    'assets/screens/greek.jpg',
+    'assets/backgrounds/english_london.png',
+    'assets/backgrounds/turkish_istanbul.png',
+    'assets/backgrounds/greek_santorini.png',
   ];
 
   static const _labels = <String>['English', 'Türkçe', 'Ελληνικά'];
@@ -38,9 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: const Duration(milliseconds: 450),
             child: Image.asset(
               _assets[_selectedIndex],
-              key: ValueKey(_selectedIndex),
+              key: ValueKey(_assets[_selectedIndex]),
               fit: BoxFit.cover,
-              filterQuality: FilterQuality.medium,
+              filterQuality: FilterQuality.high,
               errorBuilder: (_, __, ___) => const _FallbackBackground(),
             ),
           ),
@@ -50,9 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x55000000),
-                  Color(0x88000000),
-                  Color(0xF207070B),
+                  Color(0x33000000),
+                  Color(0x77000000),
+                  Color(0xEE07070B),
                 ],
                 stops: [0.0, 0.48, 1.0],
               ),
@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 10),
                     const Align(
                       alignment: Alignment.centerRight,
-                      child: Text('0.9.5+17 UI-Fallback', style: TextStyle(color: Color(0x88FFFFFF), fontSize: 9)),
+                      child: Text('0.9.5+20 PNG backgrounds', style: TextStyle(color: Color(0x88FFFFFF), fontSize: 9)),
                     ),
                   ],
                 ],
