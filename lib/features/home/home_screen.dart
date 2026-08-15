@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../journey/journey_start_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   final bool showBuildLabel;
   final String localProfileId;
@@ -30,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Santorini · Ελλάδα',
   ];
   static const _flags = <String>['🇬🇧', '🇹🇷', '🇬🇷'];
+  static const _greetings = <String>['Welcome', 'Hoş geldin', 'Καλώς ήρθες'];
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '0.9.5+23 full-width hero',
+                            '0.9.5+24 journey navigation',
                             style: TextStyle(
                               color: Color(0x88FFFFFF),
                               fontSize: 9,
@@ -214,10 +217,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _beginJourney() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Deine Reise in ${_labels[_selectedIndex]} beginnt.'),
-        behavior: SnackBarBehavior.floating,
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => JourneyStartScreen(
+          language: _labels[_selectedIndex],
+          flag: _flags[_selectedIndex],
+          greeting: _greetings[_selectedIndex],
+        ),
       ),
     );
   }
