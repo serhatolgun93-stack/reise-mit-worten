@@ -1,7 +1,7 @@
 name: reise_mit_worten
 description: Reise mit Worten - RMW-VS1 foundation starter
 publish_to: 'none'
-version: 0.9.5+18
+version: 0.9.5+19
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -31,4 +31,6 @@ flutter:
   assets:
     - assets/content/
     - assets/audio/
-    - assets/screens/
+    - assets/screens/english.jpg
+    - assets/screens/turkish.jpg
+    - assets/screens/greek.jpg
