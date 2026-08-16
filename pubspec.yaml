@@ -1,7 +1,7 @@
 name: reise_mit_worten
 description: Reise mit Worten - RMW-VS1 foundation starter
 publish_to: 'none'
-version: 0.9.5+29
+version: 0.9.5+30
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -17,20 +17,3 @@ dependencies:
   permission_handler: ^13.0.1
   crypto: ^3.0.7
   connectivity_plus: ^7.3.1
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  integration_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
-  sqflite_common_ffi: ^2.3.4+4
-
-flutter:
-  uses-material-design: true
-  assets:
-    - assets/content/
-    - assets/audio/
-    - assets/backgrounds/english_london.png
-    - assets/backgrounds/turkish_istanbul.png
-    - assets/backgrounds/greek_santorini.png
