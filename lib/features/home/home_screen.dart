@@ -37,10 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, constraints) {
           final h = constraints.maxHeight;
           final w = constraints.maxWidth;
+          final landscape = w > h;
           final small = h < 760;
-
-          final cardHeight = small ? 132.0 : 158.0;
-          final topBrandGap = small ? 2.0 : 8.0;
+          final cardHeight = landscape ? (h * 0.30).clamp(118.0, 170.0) : (small ? 132.0 : 158.0);
 
           return Stack(
             fit: StackFit.expand,
@@ -80,75 +79,103 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
-                  child: Column(
-                    children: [
-                      SizedBox(height: topBrandGap),
-                      const _BrandHeader(),
-                      const Spacer(flex: 5),
-                      const _SectionTitle(),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        height: cardHeight,
-                        child: Row(
-                          children: [
-                            for (var i = 0; i < _labels.length; i++) ...[
-                              Expanded(
-                                child: _LanguagePhotoCard(
-                                  asset: _assets[i],
-                                  flag: _flags[i],
-                                  label: _labels[i],
-                                  selected: i == _selectedIndex,
-                                  onTap: () => _select(i),
-                                ),
-                              ),
-                              if (i != _labels.length - 1) const SizedBox(width: 8),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 9),
-                      _Dots(selectedIndex: _selectedIndex),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        height: small ? 54 : 60,
-                        child: FilledButton(
-                          onPressed: _beginJourney,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF2E9A),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Reise beginnt',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Icon(Icons.arrow_forward_rounded, size: 25),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 13),
-                      const _BottomMenu(),
-                      if (widget.showBuildLabel)
-                        const SizedBox(height: 2),
-                    ],
-                  ),
+                  padding: EdgeInsets.fromLTRB(landscape ? 26 : 16, landscape ? 4 : 6, landscape ? 26 : 16, landscape ? 6 : 10),
+                  child: landscape
+                      ? _landscapeContent(cardHeight)
+                      : _portraitContent(cardHeight, small),
                 ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _portraitContent(double cardHeight, bool small) {
+    return Column(
+      children: [
+        SizedBox(height: small ? 2 : 8),
+        const _BrandHeader(),
+        const Spacer(flex: 5),
+        const _SectionTitle(),
+        const SizedBox(height: 10),
+        _languageRow(cardHeight),
+        const SizedBox(height: 9),
+        _Dots(selectedIndex: _selectedIndex),
+        const SizedBox(height: 12),
+        _startButton(height: small ? 54 : 60),
+        const SizedBox(height: 13),
+        const _BottomMenu(),
+        if (widget.showBuildLabel) const SizedBox(height: 2),
+      ],
+    );
+  }
+
+  Widget _landscapeContent(double cardHeight) {
+    return Column(
+      children: [
+        const SizedBox(height: 2),
+        const _BrandHeader(compact: true),
+        const Spacer(),
+        const _SectionTitle(),
+        const SizedBox(height: 6),
+        _languageRow(cardHeight),
+        const SizedBox(height: 6),
+        _Dots(selectedIndex: _selectedIndex),
+        const SizedBox(height: 7),
+        Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 520,
+            child: _startButton(height: 48),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _languageRow(double cardHeight) {
+    return SizedBox(
+      height: cardHeight,
+      child: Row(
+        children: [
+          for (var i = 0; i < _labels.length; i++) ...[
+            Expanded(
+              child: _LanguagePhotoCard(
+                asset: _assets[i],
+                flag: _flags[i],
+                label: _labels[i],
+                selected: i == _selectedIndex,
+                onTap: () => _select(i),
+              ),
+            ),
+            if (i != _labels.length - 1) const SizedBox(width: 8),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _startButton({required double height}) {
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: FilledButton(
+        onPressed: _beginJourney,
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFFFF2E9A),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Reise beginnt', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            SizedBox(width: 12),
+            Icon(Icons.arrow_forward_rounded, size: 25),
+          ],
+        ),
       ),
     );
   }
@@ -173,27 +200,28 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _BrandHeader extends StatelessWidget {
-  const _BrandHeader();
+  final bool compact;
+  const _BrandHeader({this.compact = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.travel_explore_rounded, size: 48, color: Colors.white),
-        const SizedBox(height: 2),
+        Icon(Icons.travel_explore_rounded, size: compact ? 31 : 48, color: Colors.white),
+        SizedBox(height: compact ? 0 : 2),
         FittedBox(
           fit: BoxFit.scaleDown,
           child: RichText(
             textAlign: TextAlign.center,
-            text: const TextSpan(
+            text: TextSpan(
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 31,
+                fontSize: compact ? 24 : 31,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -1,
               ),
-              children: [
+              children: const [
                 TextSpan(text: 'Reise '),
                 TextSpan(text: 'mit', style: TextStyle(color: Color(0xFFFF5BAE))),
                 TextSpan(text: ' Worten'),
@@ -201,17 +229,17 @@ class _BrandHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 6),
-        Container(width: 190, height: 2, color: const Color(0xFFFF2E9A)),
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: compact ? 3 : 6),
+        Container(width: compact ? 150 : 190, height: 2, color: const Color(0xFFFF2E9A)),
+        SizedBox(height: compact ? 3 : 8),
+        Text(
           "Don't learn the language.",
-          style: TextStyle(color: Colors.white, fontSize: 15.5, fontWeight: FontWeight.w700),
+          style: TextStyle(color: Colors.white, fontSize: compact ? 12.5 : 15.5, fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 1),
-        const Text(
+        Text(
           'Live it.',
-          style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900),
+          style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 15 : 18, fontWeight: FontWeight.w900),
         ),
       ],
     );
@@ -228,10 +256,7 @@ class _SectionTitle extends StatelessWidget {
         Expanded(child: Divider(color: Color(0xBFFF2E9A), thickness: 1)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            'Sprache auswählen',
-            style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w900),
-          ),
+          child: Text('Sprache auswählen', style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w900)),
         ),
         Expanded(child: Divider(color: Color(0xBFFF2E9A), thickness: 1)),
       ],
@@ -246,13 +271,7 @@ class _LanguagePhotoCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _LanguagePhotoCard({
-    required this.asset,
-    required this.flag,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _LanguagePhotoCard({required this.asset, required this.flag, required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -265,13 +284,8 @@ class _LanguagePhotoCard extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: selected ? const Color(0xFFFF2E9A) : const Color(0xCCFFFFFF),
-              width: selected ? 2.6 : 1.2,
-            ),
-            boxShadow: selected
-                ? const [BoxShadow(color: Color(0xAAFF2E9A), blurRadius: 17, spreadRadius: 1)]
-                : null,
+            border: Border.all(color: selected ? const Color(0xFFFF2E9A) : const Color(0xCCFFFFFF), width: selected ? 2.6 : 1.2),
+            boxShadow: selected ? const [BoxShadow(color: Color(0xAAFF2E9A), blurRadius: 17, spreadRadius: 1)] : null,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
@@ -281,12 +295,7 @@ class _LanguagePhotoCard extends StatelessWidget {
                 Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center),
                 const DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x00000000), Color(0xD9000000)],
-                      stops: [0.42, 1.0],
-                    ),
+                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xD9000000)], stops: [0.42, 1.0]),
                   ),
                 ),
                 Positioned(
@@ -298,12 +307,7 @@ class _LanguagePhotoCard extends StatelessWidget {
                     children: [
                       Text(flag, style: const TextStyle(fontSize: 27)),
                       const SizedBox(height: 1),
-                      Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900),
-                      ),
+                      Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
                     ],
                   ),
                 ),
@@ -324,18 +328,13 @@ class _Dots extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (index) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 8,
-          height: 8,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: index == selectedIndex ? const Color(0xFFFF2E9A) : const Color(0xFF98969D),
-          ),
-        );
-      }),
+      children: List.generate(3, (index) => AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 8,
+        height: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: index == selectedIndex ? const Color(0xFFFF2E9A) : const Color(0xFF98969D)),
+      )),
     );
   }
 }
@@ -363,10 +362,7 @@ class _BottomMenu extends StatelessWidget {
                 const SizedBox(height: 3),
                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
-                    item.label,
-                    style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
-                  ),
+                  child: Text(item.label, style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700)),
                 ),
               ],
             ),
@@ -383,11 +379,7 @@ class _FallbackBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1D1230), Color(0xFF080910), Color(0xFF160716)],
-        ),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1D1230), Color(0xFF080910), Color(0xFF160716)]),
       ),
     );
   }
