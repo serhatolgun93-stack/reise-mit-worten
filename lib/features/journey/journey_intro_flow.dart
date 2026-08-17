@@ -78,16 +78,20 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   }
 
   Widget _mariaLayer(Size screen) {
+    final asset = _showStepTwo
+        ? 'assets/characters/maria_confident.png'
+        : 'assets/characters/maria_wave.png';
+
     return Positioned(
-      left: _showStepTwo ? null : -18,
-      right: _showStepTwo ? -20 : null,
-      bottom: _showStepTwo ? 92 : 88,
+      left: _showStepTwo ? null : -10,
+      right: _showStepTwo ? -8 : null,
+      bottom: _showStepTwo ? 128 : 96,
       child: IgnorePointer(
         child: SizedBox(
-          width: screen.width * (_showStepTwo ? 0.50 : 0.55),
-          height: screen.height * (_showStepTwo ? 0.48 : 0.56),
+          width: screen.width * (_showStepTwo ? 0.43 : 0.47),
+          height: screen.height * (_showStepTwo ? 0.43 : 0.50),
           child: Image.asset(
-            'assets/characters/maria.png',
+            asset,
             fit: BoxFit.contain,
             alignment: _showStepTwo ? Alignment.bottomRight : Alignment.bottomLeft,
             filterQuality: FilterQuality.high,
@@ -106,7 +110,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         Align(
           alignment: Alignment.centerRight,
           child: Container(
-            width: screen.width * 0.72,
+            width: screen.width * 0.70,
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
             decoration: _cardDecoration(),
             child: Column(
@@ -158,7 +162,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         Align(
           alignment: Alignment.centerLeft,
           child: Container(
-            width: screen.width * 0.73,
+            width: screen.width * 0.71,
             padding: const EdgeInsets.all(20),
             decoration: _cardDecoration(),
             child: Column(
