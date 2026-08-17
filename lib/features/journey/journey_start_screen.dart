@@ -4,14 +4,12 @@ class JourneyStartScreen extends StatelessWidget {
   final String language;
   final String flag;
   final String greeting;
-  final String backgroundAsset;
 
   const JourneyStartScreen({
     super.key,
     required this.language,
     required this.flag,
     required this.greeting,
-    required this.backgroundAsset,
   });
 
   String get questionGreeting => switch (language) {
@@ -24,108 +22,103 @@ class JourneyStartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            backgroundAsset,
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF07070A)),
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x44000000), Color(0x33000000), Color(0xCC000000)],
-                stops: [0.0, 0.48, 1.0],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 34),
-                      ),
-                      const Text('2 / 8', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                    ],
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 34),
                   ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xE817161A),
-                      borderRadius: BorderRadius.circular(26),
-                      border: Border.all(color: const Color(0x44FFFFFF)),
-                      boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 26, offset: Offset(0, 12))],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(questionGreeting, style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 12),
-                        const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 32, height: 1.08, fontWeight: FontWeight.w900)),
-                        const SizedBox(height: 12),
-                        const Text('Dein Name macht deine Reise persönlicher. Ich werde dich während des Lernens damit ansprechen.', style: TextStyle(color: Color(0xFFE8E1E8), fontSize: 15, height: 1.45)),
-                        const SizedBox(height: 20),
-                        TextField(
-                          textCapitalization: TextCapitalization.words,
-                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
-                          decoration: InputDecoration(
-                            hintText: 'Dein Vorname',
-                            hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
-                            prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
-                            filled: true,
-                            fillColor: const Color(0xE61E1C22),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Color(0xFF514A56))),
-                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2)),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(color: const Color(0xC91E1C22), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF3C3740))),
-                          child: Row(children: [
-                            Text(flag, style: const TextStyle(fontSize: 28)),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text('Du lernst $language – Schritt für Schritt und in deinem Tempo.', style: const TextStyle(color: Colors.white, height: 1.4, fontWeight: FontWeight.w600))),
-                          ]),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    height: 62,
-                    child: FilledButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Schritt 3 folgt als Nächstes.'), behavior: SnackBarBehavior.floating));
-                      },
-                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFF2E9A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31))),
-                      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text('Weiter', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-                        SizedBox(width: 12),
-                        Icon(Icons.arrow_forward_rounded, size: 28),
-                      ]),
-                    ),
-                  ),
+                  const Text('2 / 8', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
                 ],
               ),
-            ),
+              const Spacer(),
+              Text(questionGreeting, style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 12),
+              const Text(
+                'Wie darf ich dich nennen?',
+                style: TextStyle(color: Colors.white, fontSize: 34, height: 1.08, fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Dein Name macht deine Reise persönlicher. Ich werde dich während des Lernens damit ansprechen.',
+                style: TextStyle(color: Color(0xFFCFC9D2), fontSize: 16, height: 1.5),
+              ),
+              const SizedBox(height: 30),
+              TextField(
+                textCapitalization: TextCapitalization.words,
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                decoration: InputDecoration(
+                  hintText: 'Dein Vorname',
+                  hintStyle: const TextStyle(color: Color(0xFF8F8992)),
+                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
+                  filled: true,
+                  fillColor: const Color(0xFF17161B),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(22),
+                    borderSide: const BorderSide(color: Color(0xFF3B3640)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(22),
+                    borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF17161B),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF2D2932)),
+                ),
+                child: Row(
+                  children: [
+                    Text(flag, style: const TextStyle(fontSize: 28)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Du lernst $language – Schritt für Schritt und in deinem Tempo.',
+                        style: const TextStyle(color: Colors.white, height: 1.4, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 62,
+                child: FilledButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Schritt 3 folgt als Nächstes.'), behavior: SnackBarBehavior.floating),
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF2E9A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31)),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Weiter', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                      SizedBox(width: 12),
+                      Icon(Icons.arrow_forward_rounded, size: 28),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
