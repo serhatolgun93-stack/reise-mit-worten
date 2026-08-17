@@ -5,6 +5,8 @@ class JourneyIntroFlow extends StatefulWidget {
   final String flag;
   final String greeting;
   final String backgroundAsset;
+  final String guideKey;
+  final String guideName;
 
   const JourneyIntroFlow({
     super.key,
@@ -12,6 +14,8 @@ class JourneyIntroFlow extends StatefulWidget {
     required this.flag,
     required this.greeting,
     required this.backgroundAsset,
+    required this.guideKey,
+    required this.guideName,
   });
 
   @override
@@ -32,6 +36,16 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         return 'Hello!';
     }
   }
+
+  bool get _isLeon => widget.guideKey == 'leon';
+
+  String get _stepOneGuideAsset => _isLeon
+      ? 'assets/characters/leon_invite.png'
+      : 'assets/characters/maria_welcome.png';
+
+  String get _stepTwoGuideAsset => _isLeon
+      ? 'assets/characters/leon_confident.png'
+      : 'assets/characters/maria_confident.png';
 
   @override
   void dispose() {
@@ -55,25 +69,39 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             fit: BoxFit.cover,
             alignment: Alignment.center,
             filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF050508)),
+            errorBuilder: (_, __, ___) =>
+                const ColoredBox(color: Color(0xFF050508)),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x16000000), Color(0x08000000), Color(0xB8000000)],
+                colors: [
+                  Color(0x16000000),
+                  Color(0x08000000),
+                  Color(0xB8000000),
+                ],
                 stops: [0.0, 0.50, 1.0],
               ),
             ),
           ),
-          _mariaLayer(screen, landscape),
+          _guideLayer(screen, landscape),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(landscape ? 24 : 18, landscape ? 8 : 12, landscape ? 24 : 18, landscape ? 10 : 18),
+              padding: EdgeInsets.fromLTRB(
+                landscape ? 24 : 18,
+                landscape ? 8 : 12,
+                landscape ? 24 : 18,
+                landscape ? 10 : 18,
+              ),
               child: _showStepTwo
-                  ? (landscape ? _stepTwoLandscape(screen) : _stepTwoPortrait(screen))
-                  : (landscape ? _stepOneLandscape(screen) : _stepOnePortrait(screen)),
+                  ? (landscape
+                      ? _stepTwoLandscape(screen)
+                      : _stepTwoPortrait(screen))
+                  : (landscape
+                      ? _stepOneLandscape(screen)
+                      : _stepOnePortrait(screen)),
             ),
           ),
         ],
@@ -81,10 +109,8 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
-  Widget _mariaLayer(Size screen, bool landscape) {
-    final asset = _showStepTwo
-        ? 'assets/characters/maria_confident.png'
-        : 'assets/characters/maria_welcome.png';
+  Widget _guideLayer(Size screen, bool landscape) {
+    final asset = _showStepTwo ? _stepTwoGuideAsset : _stepOneGuideAsset;
 
     if (landscape) {
       return Positioned(
@@ -98,7 +124,9 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             child: Image.asset(
               asset,
               fit: BoxFit.contain,
-              alignment: _showStepTwo ? Alignment.bottomRight : Alignment.bottomLeft,
+              alignment: _showStepTwo
+                  ? Alignment.bottomRight
+                  : Alignment.bottomLeft,
               filterQuality: FilterQuality.high,
               errorBuilder: (_, __, ___) => const SizedBox.shrink(),
             ),
@@ -118,7 +146,9 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           child: Image.asset(
             asset,
             fit: BoxFit.contain,
-            alignment: _showStepTwo ? Alignment.bottomRight : Alignment.bottomLeft,
+            alignment: _showStepTwo
+                ? Alignment.bottomRight
+                : Alignment.bottomLeft,
             filterQuality: FilterQuality.high,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
@@ -156,7 +186,11 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           alignment: Alignment.centerRight,
           child: SizedBox(
             width: screen.width * 0.48,
-            child: _pinkButton('Weiter', () => setState(() => _showStepTwo = true), height: 50),
+            child: _pinkButton(
+              'Weiter',
+              () => setState(() => _showStepTwo = true),
+              height: 50,
+            ),
           ),
         ),
       ],
@@ -166,7 +200,12 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   Widget _welcomeCard({required double width, required bool compact}) {
     return Container(
       width: width,
-      padding: EdgeInsets.fromLTRB(compact ? 22 : 18, compact ? 18 : 18, compact ? 22 : 18, compact ? 18 : 20),
+      padding: EdgeInsets.fromLTRB(
+        compact ? 22 : 18,
+        18,
+        compact ? 22 : 18,
+        compact ? 18 : 20,
+      ),
       decoration: _cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,30 +213,55 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         children: [
           Row(
             children: [
-              const Icon(Icons.favorite_rounded, color: Color(0xFFFF2E9A), size: 21),
+              const Icon(
+                Icons.favorite_rounded,
+                color: Color(0xFFFF2E9A),
+                size: 21,
+              ),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
                   learningGreeting,
-                  style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 16 : 17, fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    color: const Color(0xFFFF5BAE),
+                    fontSize: compact ? 16 : 17,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ],
           ),
           SizedBox(height: compact ? 8 : 12),
           Text(
-            'Maria begrüßt dich',
-            style: TextStyle(color: Colors.white, fontSize: compact ? 28 : 28, height: 1.08, fontWeight: FontWeight.w900),
+            '${widget.guideName} begrüßt dich',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              height: 1.08,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           SizedBox(height: compact ? 8 : 12),
           const Divider(color: Color(0xCCFF2E9A), thickness: 1.2),
           SizedBox(height: compact ? 8 : 12),
           Text(
             'Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.',
-            style: TextStyle(color: const Color(0xFFF2EDF2), fontSize: compact ? 14 : 14.5, height: compact ? 1.32 : 1.42, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: const Color(0xFFF2EDF2),
+              fontSize: compact ? 14 : 14.5,
+              height: compact ? 1.32 : 1.42,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           SizedBox(height: compact ? 10 : 14),
-          Text('${widget.flag} ${widget.language}', style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 17 : 18, fontWeight: FontWeight.w900)),
+          Text(
+            '${widget.flag} ${widget.language}',
+            style: TextStyle(
+              color: const Color(0xFFFF5BAE),
+              fontSize: compact ? 17 : 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ],
       ),
     );
@@ -244,19 +308,38 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   Widget _nameCard({required double width, required bool compact}) {
     return Container(
       width: width,
-      padding: EdgeInsets.all(compact ? 18 : 18),
+      padding: const EdgeInsets.all(18),
       decoration: _cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 14 : 14.5, fontWeight: FontWeight.w900)),
-          SizedBox(height: compact ? 6 : 9),
-          Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: compact ? 25 : 27, height: 1.07, fontWeight: FontWeight.w900)),
+          Text(
+            'LERNEN WIR UNS KENNEN',
+            style: TextStyle(
+              color: const Color(0xFFFF5BAE),
+              fontSize: compact ? 14 : 14.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
           SizedBox(height: compact ? 6 : 9),
           Text(
-            'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
-            style: TextStyle(color: const Color(0xFFF2EDF2), fontSize: compact ? 13.5 : 13.5, height: compact ? 1.28 : 1.36),
+            'Wie darf ich dich nennen?',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 25 : 27,
+              height: 1.07,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: compact ? 6 : 9),
+          Text(
+            'Dein Name macht deine Reise persönlicher. ${widget.guideName} wird dich während des Lernens damit ansprechen.',
+            style: TextStyle(
+              color: const Color(0xFFF2EDF2),
+              fontSize: 13.5,
+              height: compact ? 1.28 : 1.36,
+            ),
           ),
           SizedBox(height: compact ? 10 : 14),
           TextField(
@@ -264,21 +347,34 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.done,
             onChanged: (_) => setState(() {}),
-            style: TextStyle(color: Colors.white, fontSize: compact ? 17 : 18, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 17 : 18,
+              fontWeight: FontWeight.w700,
+            ),
             decoration: InputDecoration(
               hintText: 'Dein Vorname',
               hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
-              prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
+              prefixIcon: const Icon(
+                Icons.person_outline_rounded,
+                color: Color(0xFFFF2E9A),
+              ),
               filled: true,
               fillColor: const Color(0xE61E1C22),
-              contentPadding: EdgeInsets.symmetric(horizontal: compact ? 14 : 15, vertical: compact ? 12 : 15),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: compact ? 14 : 15,
+                vertical: compact ? 12 : 15,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
                 borderSide: const BorderSide(color: Color(0xFF514A56)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFFFF2E9A),
+                  width: 2,
+                ),
               ),
             ),
           ),
@@ -293,12 +389,20 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             ),
             child: Row(
               children: [
-                Text(widget.flag, style: TextStyle(fontSize: compact ? 22 : 24)),
+                Text(
+                  widget.flag,
+                  style: TextStyle(fontSize: compact ? 22 : 24),
+                ),
                 const SizedBox(width: 9),
                 Expanded(
                   child: Text(
                     'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
-                    style: TextStyle(color: Colors.white, fontSize: compact ? 12.5 : 12.5, height: 1.25, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.5,
+                      height: 1.25,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -323,7 +427,9 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               FocusScope.of(context).unfocus();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Willkommen, ${_nameController.text.trim()}! Schritt 3 folgt als Nächstes.'),
+                  content: Text(
+                    'Willkommen, ${_nameController.text.trim()}! ${widget.guideName} begleitet dich weiter. Schritt 3 folgt als Nächstes.',
+                  ),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -336,8 +442,22 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        IconButton(onPressed: onBack, icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 34)),
-        Text(step, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+        IconButton(
+          onPressed: onBack,
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: Colors.white,
+            size: 34,
+          ),
+        ),
+        Text(
+          step,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ],
     );
   }
@@ -346,10 +466,20 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         color: const Color(0xE817161A),
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: const Color(0x44FFFFFF)),
-        boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 28, offset: Offset(0, 12))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x77000000),
+            blurRadius: 28,
+            offset: Offset(0, 12),
+          ),
+        ],
       );
 
-  Widget _pinkButton(String label, VoidCallback? onPressed, {double height = 62}) {
+  Widget _pinkButton(
+    String label,
+    VoidCallback? onPressed, {
+    double height = 62,
+  }) {
     return SizedBox(
       width: double.infinity,
       height: height,
@@ -359,14 +489,25 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           backgroundColor: const Color(0xFFFF2E9A),
           disabledBackgroundColor: const Color(0x88FF2E9A),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(height / 2)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(height / 2),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: TextStyle(fontSize: height < 55 ? 18 : 20, fontWeight: FontWeight.w900)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: height < 55 ? 18 : 20,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
             const SizedBox(width: 12),
-            Icon(Icons.arrow_forward_rounded, size: height < 55 ? 24 : 28),
+            Icon(
+              Icons.arrow_forward_rounded,
+              size: height < 55 ? 24 : 28,
+            ),
           ],
         ),
       ),
