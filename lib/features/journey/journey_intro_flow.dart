@@ -131,7 +131,6 @@ class JourneyIntroFlow extends StatelessWidget {
                               language: language,
                               flag: flag,
                               greeting: greeting,
-                              backgroundAsset: backgroundAsset,
                             ),
                           ),
                         );
