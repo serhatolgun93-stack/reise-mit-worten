@@ -42,6 +42,8 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.sizeOf(context);
+    final landscape = screen.width > screen.height;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFF050508),
@@ -65,11 +67,13 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               ),
             ),
           ),
-          _mariaLayer(screen),
+          _mariaLayer(screen, landscape),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
-              child: _showStepTwo ? _stepTwo(screen) : _stepOne(screen),
+              padding: EdgeInsets.fromLTRB(landscape ? 24 : 18, landscape ? 8 : 12, landscape ? 24 : 18, landscape ? 10 : 18),
+              child: _showStepTwo
+                  ? (landscape ? _stepTwoLandscape(screen) : _stepTwoPortrait(screen))
+                  : (landscape ? _stepOneLandscape(screen) : _stepOnePortrait(screen)),
             ),
           ),
         ],
@@ -77,12 +81,31 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
-  Widget _mariaLayer(Size screen) {
-    // maria_wave.png currently contains a visible checkerboard background.
-    // Use the clean transparent welcome pose for step 1 until the wave asset is replaced.
+  Widget _mariaLayer(Size screen, bool landscape) {
     final asset = _showStepTwo
         ? 'assets/characters/maria_confident.png'
         : 'assets/characters/maria_welcome.png';
+
+    if (landscape) {
+      return Positioned(
+        left: _showStepTwo ? null : -18,
+        right: _showStepTwo ? -12 : null,
+        bottom: -6,
+        child: IgnorePointer(
+          child: SizedBox(
+            width: screen.width * (_showStepTwo ? 0.31 : 0.34),
+            height: screen.height * 0.86,
+            child: Image.asset(
+              asset,
+              fit: BoxFit.contain,
+              alignment: _showStepTwo ? Alignment.bottomRight : Alignment.bottomLeft,
+              filterQuality: FilterQuality.high,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Positioned(
       left: _showStepTwo ? null : -34,
@@ -104,47 +127,14 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
-  Widget _stepOne(Size screen) {
+  Widget _stepOnePortrait(Size screen) {
     return Column(
       children: [
         _header('1 / 8', () => Navigator.of(context).pop()),
         const Spacer(),
         Align(
           alignment: Alignment.centerRight,
-          child: Container(
-            width: screen.width * 0.68,
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-            decoration: _cardDecoration(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.favorite_rounded, color: Color(0xFFFF2E9A), size: 21),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        learningGreeting,
-                        style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 17, fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Text('Maria begrüßt dich', style: TextStyle(color: Colors.white, fontSize: 28, height: 1.08, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 12),
-                const Divider(color: Color(0xCCFF2E9A), thickness: 1.2),
-                const SizedBox(height: 12),
-                const Text(
-                  'Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.',
-                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 14.5, height: 1.42, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 14),
-                Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
-              ],
-            ),
-          ),
+          child: _welcomeCard(width: screen.width * 0.68, compact: false),
         ),
         const SizedBox(height: 16),
         _pinkButton('Weiter', () => setState(() => _showStepTwo = true)),
@@ -152,99 +142,193 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
-  Widget _stepTwo(Size screen) {
+  Widget _stepOneLandscape(Size screen) {
+    return Column(
+      children: [
+        _header('1 / 8', () => Navigator.of(context).pop()),
+        const Spacer(),
+        Align(
+          alignment: Alignment.centerRight,
+          child: _welcomeCard(width: screen.width * 0.56, compact: true),
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            width: screen.width * 0.48,
+            child: _pinkButton('Weiter', () => setState(() => _showStepTwo = true), height: 50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _welcomeCard({required double width, required bool compact}) {
+    return Container(
+      width: width,
+      padding: EdgeInsets.fromLTRB(compact ? 22 : 18, compact ? 18 : 18, compact ? 22 : 18, compact ? 18 : 20),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.favorite_rounded, color: Color(0xFFFF2E9A), size: 21),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  learningGreeting,
+                  style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 16 : 17, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: compact ? 8 : 12),
+          Text(
+            'Maria begrüßt dich',
+            style: TextStyle(color: Colors.white, fontSize: compact ? 28 : 28, height: 1.08, fontWeight: FontWeight.w900),
+          ),
+          SizedBox(height: compact ? 8 : 12),
+          const Divider(color: Color(0xCCFF2E9A), thickness: 1.2),
+          SizedBox(height: compact ? 8 : 12),
+          Text(
+            'Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.',
+            style: TextStyle(color: const Color(0xFFF2EDF2), fontSize: compact ? 14 : 14.5, height: compact ? 1.32 : 1.42, fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: compact ? 10 : 14),
+          Text('${widget.flag} ${widget.language}', style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 17 : 18, fontWeight: FontWeight.w900)),
+        ],
+      ),
+    );
+  }
+
+  Widget _stepTwoPortrait(Size screen) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _header('2 / 8', () {
-          FocusScope.of(context).unfocus();
-          setState(() => _showStepTwo = false);
-        }),
+        _header('2 / 8', _backToStepOne),
         const Spacer(),
         Align(
           alignment: Alignment.centerLeft,
-          child: Container(
-            width: screen.width * 0.66,
-            padding: const EdgeInsets.all(18),
-            decoration: _cardDecoration(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+          child: _nameCard(width: screen.width * 0.66, compact: false),
+        ),
+        const SizedBox(height: 16),
+        _continueNameButton(),
+      ],
+    );
+  }
+
+  Widget _stepTwoLandscape(Size screen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _header('2 / 8', _backToStepOne),
+        const Spacer(),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _nameCard(width: screen.width * 0.62, compact: true),
+        ),
+        const SizedBox(height: 9),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: screen.width * 0.47,
+            child: _continueNameButton(height: 50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _nameCard({required double width, required bool compact}) {
+    return Container(
+      width: width,
+      padding: EdgeInsets.all(compact ? 18 : 18),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 14 : 14.5, fontWeight: FontWeight.w900)),
+          SizedBox(height: compact ? 6 : 9),
+          Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: compact ? 25 : 27, height: 1.07, fontWeight: FontWeight.w900)),
+          SizedBox(height: compact ? 6 : 9),
+          Text(
+            'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
+            style: TextStyle(color: const Color(0xFFF2EDF2), fontSize: compact ? 13.5 : 13.5, height: compact ? 1.28 : 1.36),
+          ),
+          SizedBox(height: compact ? 10 : 14),
+          TextField(
+            controller: _nameController,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.done,
+            onChanged: (_) => setState(() {}),
+            style: TextStyle(color: Colors.white, fontSize: compact ? 17 : 18, fontWeight: FontWeight.w700),
+            decoration: InputDecoration(
+              hintText: 'Dein Vorname',
+              hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
+              prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
+              filled: true,
+              fillColor: const Color(0xE61E1C22),
+              contentPadding: EdgeInsets.symmetric(horizontal: compact ? 14 : 15, vertical: compact ? 12 : 15),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: Color(0xFF514A56)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
+              ),
+            ),
+          ),
+          SizedBox(height: compact ? 9 : 12),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(compact ? 10 : 12),
+            decoration: BoxDecoration(
+              color: const Color(0xC91E1C22),
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(color: const Color(0xFF3C3740)),
+            ),
+            child: Row(
               children: [
-                const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 14.5, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 9),
-                const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 27, height: 1.07, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 9),
-                const Text(
-                  'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
-                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 13.5, height: 1.36),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  textInputAction: TextInputAction.done,
-                  onChanged: (_) => setState(() {}),
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
-                  decoration: InputDecoration(
-                    hintText: 'Dein Vorname',
-                    hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
-                    prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
-                    filled: true,
-                    fillColor: const Color(0xE61E1C22),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(color: Color(0xFF514A56)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xC91E1C22),
-                    borderRadius: BorderRadius.circular(17),
-                    border: Border.all(color: const Color(0xFF3C3740)),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(widget.flag, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 9),
-                      Expanded(
-                        child: Text(
-                          'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
-                          style: const TextStyle(color: Colors.white, fontSize: 12.5, height: 1.28, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
+                Text(widget.flag, style: TextStyle(fontSize: compact ? 22 : 24)),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(
+                    'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
+                    style: TextStyle(color: Colors.white, fontSize: compact ? 12.5 : 12.5, height: 1.25, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        _pinkButton(
-          'Weiter',
-          _nameController.text.trim().isEmpty
-              ? null
-              : () {
-                  FocusScope.of(context).unfocus();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Willkommen, ${_nameController.text.trim()}! Schritt 3 folgt als Nächstes.'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  void _backToStepOne() {
+    FocusScope.of(context).unfocus();
+    setState(() => _showStepTwo = false);
+  }
+
+  Widget _continueNameButton({double height = 62}) {
+    return _pinkButton(
+      'Weiter',
+      _nameController.text.trim().isEmpty
+          ? null
+          : () {
+              FocusScope.of(context).unfocus();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Willkommen, ${_nameController.text.trim()}! Schritt 3 folgt als Nächstes.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+      height: height,
     );
   }
 
@@ -265,24 +349,24 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 28, offset: Offset(0, 12))],
       );
 
-  Widget _pinkButton(String label, VoidCallback? onPressed) {
+  Widget _pinkButton(String label, VoidCallback? onPressed, {double height = 62}) {
     return SizedBox(
       width: double.infinity,
-      height: 62,
+      height: height,
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: const Color(0xFFFF2E9A),
           disabledBackgroundColor: const Color(0x88FF2E9A),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(height / 2)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            Text(label, style: TextStyle(fontSize: height < 55 ? 18 : 20, fontWeight: FontWeight.w900)),
             const SizedBox(width: 12),
-            const Icon(Icons.arrow_forward_rounded, size: 28),
+            Icon(Icons.arrow_forward_rounded, size: height < 55 ? 24 : 28),
           ],
         ),
       ),
