@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'maria_asset_v2.dart';
-
 class JourneyStartScreen extends StatelessWidget {
   final String language;
   final String flag;
@@ -24,8 +22,6 @@ class JourneyStartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.sizeOf(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Stack(
@@ -43,29 +39,8 @@ class JourneyStartScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x55000000), Color(0x22000000), Color(0xB8000000)],
-                stops: [0.0, 0.45, 1.0],
-              ),
-            ),
-          ),
-          Positioned(
-            right: -20,
-            bottom: 82,
-            child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.diagonal3Values(-1, 1, 1),
-              child: SizedBox(
-                width: screen.width * 0.50,
-                height: screen.height * 0.50,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomRight,
-                  child: Image.memory(
-                    mariaWelcomePngBytes,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  ),
-                ),
+                colors: [Color(0x44000000), Color(0x33000000), Color(0xCC000000)],
+                stops: [0.0, 0.48, 1.0],
               ),
             ),
           ),
@@ -87,24 +62,23 @@ class JourneyStartScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   Container(
-                    width: screen.width * 0.72,
-                    margin: EdgeInsets.only(right: screen.width * 0.18),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xDD17161B),
+                      color: const Color(0xE817161A),
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(color: const Color(0x44FFFFFF)),
                       boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 26, offset: Offset(0, 12))],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(questionGreeting, style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w800)),
                         const SizedBox(height: 12),
                         const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 32, height: 1.08, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 12),
                         const Text('Dein Name macht deine Reise persönlicher. Ich werde dich während des Lernens damit ansprechen.', style: TextStyle(color: Color(0xFFE8E1E8), fontSize: 15, height: 1.45)),
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 20),
                         TextField(
                           textCapitalization: TextCapitalization.words,
                           style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
