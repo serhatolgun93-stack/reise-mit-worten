@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'journey_start_screen.dart';
 import 'maria_asset_v2.dart';
 
-class JourneyIntroFlow extends StatelessWidget {
+class JourneyIntroFlow extends StatefulWidget {
   final String language;
   final String flag;
   final String greeting;
@@ -17,8 +17,15 @@ class JourneyIntroFlow extends StatelessWidget {
     required this.backgroundAsset,
   });
 
+  @override
+  State<JourneyIntroFlow> createState() => _JourneyIntroFlowState();
+}
+
+class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
+  bool _showStepTwo = false;
+
   String get learningGreeting {
-    switch (language) {
+    switch (widget.language) {
       case 'Türkçe':
         return 'Merhaba!';
       case 'Ελληνικά':
@@ -30,6 +37,14 @@ class JourneyIntroFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_showStepTwo) {
+      return JourneyStartScreen(
+        language: widget.language,
+        flag: widget.flag,
+        greeting: widget.greeting,
+      );
+    }
+
     final screen = MediaQuery.sizeOf(context);
 
     return Scaffold(
@@ -38,7 +53,7 @@ class JourneyIntroFlow extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            backgroundAsset,
+            widget.backgroundAsset,
             fit: BoxFit.cover,
             alignment: Alignment.center,
             filterQuality: FilterQuality.high,
@@ -114,7 +129,7 @@ class JourneyIntroFlow extends StatelessWidget {
                           const SizedBox(height: 14),
                           const Text('Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.', style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 16),
-                          Text('$flag $language', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
+                          Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
                         ],
                       ),
                     ),
@@ -124,17 +139,7 @@ class JourneyIntroFlow extends StatelessWidget {
                     width: double.infinity,
                     height: 62,
                     child: FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute<void>(
-                            builder: (_) => JourneyStartScreen(
-                              language: language,
-                              flag: flag,
-                              greeting: greeting,
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: () => setState(() => _showStepTwo = true),
                       style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFF2E9A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31))),
                       child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Text('Weiter', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
