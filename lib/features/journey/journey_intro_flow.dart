@@ -65,6 +65,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               ),
             ),
           ),
+          _mariaLayer(screen),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
@@ -72,6 +73,27 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _mariaLayer(Size screen) {
+    return Positioned(
+      left: _showStepTwo ? null : -18,
+      right: _showStepTwo ? -20 : null,
+      bottom: _showStepTwo ? 92 : 88,
+      child: IgnorePointer(
+        child: SizedBox(
+          width: screen.width * (_showStepTwo ? 0.50 : 0.55),
+          height: screen.height * (_showStepTwo ? 0.48 : 0.56),
+          child: Image.asset(
+            'assets/characters/maria.png',
+            fit: BoxFit.contain,
+            alignment: _showStepTwo ? Alignment.bottomRight : Alignment.bottomLeft,
+            filterQuality: FilterQuality.high,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        ),
       ),
     );
   }
@@ -133,68 +155,72 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           setState(() => _showStepTwo = false);
         }),
         const Spacer(),
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: _cardDecoration(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 16, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 12),
-              const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 31, height: 1.08, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 12),
-              const Text(
-                'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
-                style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _nameController,
-                textCapitalization: TextCapitalization.words,
-                textInputAction: TextInputAction.done,
-                onChanged: (_) => setState(() {}),
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
-                decoration: InputDecoration(
-                  hintText: 'Dein Vorname',
-                  hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
-                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
-                  filled: true,
-                  fillColor: const Color(0xE61E1C22),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Color(0xFF514A56)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
-                  ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: screen.width * 0.73,
+            padding: const EdgeInsets.all(20),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 15, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 10),
+                const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 28, height: 1.08, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 10),
+                const Text(
+                  'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
+                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 14, height: 1.4),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xC91E1C22),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFF3C3740)),
-                ),
-                child: Row(
-                  children: [
-                    Text(widget.flag, style: const TextStyle(fontSize: 27)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
-                        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35, fontWeight: FontWeight.w600),
-                      ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.done,
+                  onChanged: (_) => setState(() {}),
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                  decoration: InputDecoration(
+                    hintText: 'Dein Vorname',
+                    hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
+                    prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
+                    filled: true,
+                    fillColor: const Color(0xE61E1C22),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Color(0xFF514A56)),
                     ),
-                  ],
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: const Color(0xC91E1C22),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFF3C3740)),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(widget.flag, style: const TextStyle(fontSize: 25)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.3, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 18),
