@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../journey/journey_intro_flow.dart';
+import '../journey/guide_selection_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool showBuildLabel;
@@ -39,7 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
           final w = constraints.maxWidth;
           final landscape = w > h;
           final small = h < 760;
-          final cardHeight = landscape ? (h * 0.30).clamp(118.0, 170.0) : (small ? 132.0 : 158.0);
+          final cardHeight = landscape
+              ? (h * 0.30).clamp(118.0, 170.0)
+              : (small ? 132.0 : 158.0);
 
           return Stack(
             fit: StackFit.expand,
@@ -79,7 +81,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(landscape ? 26 : 16, landscape ? 4 : 6, landscape ? 26 : 16, landscape ? 6 : 10),
+                  padding: EdgeInsets.fromLTRB(
+                    landscape ? 26 : 16,
+                    landscape ? 4 : 6,
+                    landscape ? 26 : 16,
+                    landscape ? 6 : 10,
+                  ),
                   child: landscape
                       ? _landscapeContent(cardHeight)
                       : _portraitContent(cardHeight, small),
@@ -166,12 +173,17 @@ class _HomeScreenState extends State<HomeScreen> {
         style: FilledButton.styleFrom(
           backgroundColor: const Color(0xFFFF2E9A),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Reise beginnt', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(
+              'Reise beginnt',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             SizedBox(width: 12),
             Icon(Icons.arrow_forward_rounded, size: 25),
           ],
@@ -188,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _beginJourney() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => JourneyIntroFlow(
+        builder: (_) => GuideSelectionScreen(
           language: _labels[_selectedIndex],
           flag: _flags[_selectedIndex],
           greeting: _greetings[_selectedIndex],
@@ -208,7 +220,11 @@ class _BrandHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.travel_explore_rounded, size: compact ? 31 : 48, color: Colors.white),
+        Icon(
+          Icons.travel_explore_rounded,
+          size: compact ? 31 : 48,
+          color: Colors.white,
+        ),
         SizedBox(height: compact ? 0 : 2),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -223,23 +239,38 @@ class _BrandHeader extends StatelessWidget {
               ),
               children: const [
                 TextSpan(text: 'Reise '),
-                TextSpan(text: 'mit', style: TextStyle(color: Color(0xFFFF5BAE))),
+                TextSpan(
+                  text: 'mit',
+                  style: TextStyle(color: Color(0xFFFF5BAE)),
+                ),
                 TextSpan(text: ' Worten'),
               ],
             ),
           ),
         ),
         SizedBox(height: compact ? 3 : 6),
-        Container(width: compact ? 150 : 190, height: 2, color: const Color(0xFFFF2E9A)),
+        Container(
+          width: compact ? 150 : 190,
+          height: 2,
+          color: const Color(0xFFFF2E9A),
+        ),
         SizedBox(height: compact ? 3 : 8),
         Text(
           "Don't learn the language.",
-          style: TextStyle(color: Colors.white, fontSize: compact ? 12.5 : 15.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: compact ? 12.5 : 15.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 1),
         Text(
           'Live it.',
-          style: TextStyle(color: const Color(0xFFFF5BAE), fontSize: compact ? 15 : 18, fontWeight: FontWeight.w900),
+          style: TextStyle(
+            color: const Color(0xFFFF5BAE),
+            fontSize: compact ? 15 : 18,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ],
     );
@@ -253,12 +284,23 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        Expanded(child: Divider(color: Color(0xBFFF2E9A), thickness: 1)),
+        Expanded(
+          child: Divider(color: Color(0xBFFF2E9A), thickness: 1),
+        ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text('Sprache auswählen', style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.w900)),
+          child: Text(
+            'Sprache auswählen',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ),
-        Expanded(child: Divider(color: Color(0xBFFF2E9A), thickness: 1)),
+        Expanded(
+          child: Divider(color: Color(0xBFFF2E9A), thickness: 1),
+        ),
       ],
     );
   }
@@ -271,7 +313,13 @@ class _LanguagePhotoCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _LanguagePhotoCard({required this.asset, required this.flag, required this.label, required this.selected, required this.onTap});
+  const _LanguagePhotoCard({
+    required this.asset,
+    required this.flag,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -284,18 +332,40 @@ class _LanguagePhotoCard extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: selected ? const Color(0xFFFF2E9A) : const Color(0xCCFFFFFF), width: selected ? 2.6 : 1.2),
-            boxShadow: selected ? const [BoxShadow(color: Color(0xAAFF2E9A), blurRadius: 17, spreadRadius: 1)] : null,
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFFFF2E9A)
+                  : const Color(0xCCFFFFFF),
+              width: selected ? 2.6 : 1.2,
+            ),
+            boxShadow: selected
+                ? const [
+                    BoxShadow(
+                      color: Color(0xAAFF2E9A),
+                      blurRadius: 17,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center),
+                Image.asset(
+                  asset,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                ),
                 const DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xD9000000)], stops: [0.42, 1.0]),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x00000000), Color(0xD9000000)],
+                      stops: [0.42, 1.0],
+                    ),
                   ),
                 ),
                 Positioned(
@@ -307,7 +377,16 @@ class _LanguagePhotoCard extends StatelessWidget {
                     children: [
                       Text(flag, style: const TextStyle(fontSize: 27)),
                       const SizedBox(height: 1),
-                      Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                      Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -328,13 +407,21 @@ class _Dots extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (index) => AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 8,
-        height: 8,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: index == selectedIndex ? const Color(0xFFFF2E9A) : const Color(0xFF98969D)),
-      )),
+      children: List.generate(
+        3,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 8,
+          height: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: index == selectedIndex
+                ? const Color(0xFFFF2E9A)
+                : const Color(0xFF98969D),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -362,7 +449,14 @@ class _BottomMenu extends StatelessWidget {
                 const SizedBox(height: 3),
                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(item.label, style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700)),
+                  child: Text(
+                    item.label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -379,7 +473,15 @@ class _FallbackBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1D1230), Color(0xFF080910), Color(0xFF160716)]),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1D1230),
+            Color(0xFF080910),
+            Color(0xFF160716),
+          ],
+        ),
       ),
     );
   }
