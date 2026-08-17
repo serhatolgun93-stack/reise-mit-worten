@@ -60,15 +60,15 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x22000000), Color(0x18000000), Color(0xB8000000)],
-                stops: [0.0, 0.48, 1.0],
+                colors: [Color(0x16000000), Color(0x08000000), Color(0xB8000000)],
+                stops: [0.0, 0.50, 1.0],
               ),
             ),
           ),
           _mariaLayer(screen),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
               child: _showStepTwo ? _stepTwo(screen) : _stepOne(screen),
             ),
           ),
@@ -78,18 +78,20 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   }
 
   Widget _mariaLayer(Size screen) {
+    // maria_wave.png currently contains a visible checkerboard background.
+    // Use the clean transparent welcome pose for step 1 until the wave asset is replaced.
     final asset = _showStepTwo
         ? 'assets/characters/maria_confident.png'
-        : 'assets/characters/maria_wave.png';
+        : 'assets/characters/maria_welcome.png';
 
     return Positioned(
-      left: _showStepTwo ? null : -10,
-      right: _showStepTwo ? -8 : null,
-      bottom: _showStepTwo ? 128 : 96,
+      left: _showStepTwo ? null : -34,
+      right: _showStepTwo ? -42 : null,
+      bottom: _showStepTwo ? 108 : 138,
       child: IgnorePointer(
         child: SizedBox(
-          width: screen.width * (_showStepTwo ? 0.43 : 0.47),
-          height: screen.height * (_showStepTwo ? 0.43 : 0.50),
+          width: screen.width * (_showStepTwo ? 0.61 : 0.67),
+          height: screen.height * (_showStepTwo ? 0.58 : 0.61),
           child: Image.asset(
             asset,
             fit: BoxFit.contain,
@@ -110,8 +112,8 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         Align(
           alignment: Alignment.centerRight,
           child: Container(
-            width: screen.width * 0.70,
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
+            width: screen.width * 0.68,
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
             decoration: _cardDecoration(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,22 +131,22 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                const Text('Maria begrüßt dich', style: TextStyle(color: Colors.white, fontSize: 29, height: 1.08, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
+                const Text('Maria begrüßt dich', style: TextStyle(color: Colors.white, fontSize: 28, height: 1.08, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 12),
                 const Divider(color: Color(0xCCFF2E9A), thickness: 1.2),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 const Text(
                   'Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.',
-                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 14.5, height: 1.42, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         _pinkButton('Weiter', () => setState(() => _showStepTwo = true)),
       ],
     );
@@ -162,22 +164,22 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         Align(
           alignment: Alignment.centerLeft,
           child: Container(
-            width: screen.width * 0.71,
-            padding: const EdgeInsets.all(20),
+            width: screen.width * 0.66,
+            padding: const EdgeInsets.all(18),
             decoration: _cardDecoration(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 15, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 10),
-                const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 28, height: 1.08, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 10),
+                const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 14.5, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 9),
+                const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 27, height: 1.07, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 9),
                 const Text(
                   'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
-                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 14, height: 1.4),
+                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 13.5, height: 1.36),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 TextField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
@@ -190,34 +192,34 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
                     prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
                     filled: true,
                     fillColor: const Color(0xE61E1C22),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       borderSide: const BorderSide(color: Color(0xFF514A56)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(13),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: const Color(0xC91E1C22),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(17),
                     border: Border.all(color: const Color(0xFF3C3740)),
                   ),
                   child: Row(
                     children: [
-                      Text(widget.flag, style: const TextStyle(fontSize: 25)),
-                      const SizedBox(width: 10),
+                      Text(widget.flag, style: const TextStyle(fontSize: 24)),
+                      const SizedBox(width: 9),
                       Expanded(
                         child: Text(
                           'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.3, fontWeight: FontWeight.w600),
+                          style: const TextStyle(color: Colors.white, fontSize: 12.5, height: 1.28, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -227,7 +229,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             ),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         _pinkButton(
           'Weiter',
           _nameController.text.trim().isEmpty
