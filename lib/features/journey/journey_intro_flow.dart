@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'journey_start_screen.dart';
 import 'maria_asset_v2.dart';
 
 class JourneyIntroFlow extends StatefulWidget {
@@ -37,14 +36,35 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
 
   @override
   Widget build(BuildContext context) {
-    if (_showStepTwo) {
-      return JourneyStartScreen(
-        language: widget.language,
-        flag: widget.flag,
-        greeting: widget.greeting,
-      );
-    }
+    return _showStepTwo ? _buildStepTwo(context) : _buildStepOne(context);
+  }
 
+  Widget _buildBackground() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          widget.backgroundAsset,
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF050508)),
+        ),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x22000000), Color(0x18000000), Color(0xB8000000)],
+              stops: [0.0, 0.48, 1.0],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepOne(BuildContext context) {
     final screen = MediaQuery.sizeOf(context);
 
     return Scaffold(
@@ -52,23 +72,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            widget.backgroundAsset,
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF050508)),
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x22000000), Color(0x18000000), Color(0xB8000000)],
-                stops: [0.0, 0.48, 1.0],
-              ),
-            ),
-          ),
+          _buildBackground(),
           Positioned(
             left: -14,
             bottom: 96,
@@ -135,24 +139,91 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 62,
-                    child: FilledButton(
-                      onPressed: () => setState(() => _showStepTwo = true),
-                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFF2E9A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31))),
-                      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text('Weiter', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-                        SizedBox(width: 12),
-                        Icon(Icons.arrow_forward_rounded, size: 28),
-                      ]),
-                    ),
-                  ),
+                  _pinkButton('Weiter', () => setState(() => _showStepTwo = true)),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStepTwo(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF050508),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildBackground(),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () => setState(() => _showStepTwo = false),
+                        icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 34),
+                      ),
+                      const Text('2 / 8', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      color: const Color(0xE817161A),
+                      borderRadius: BorderRadius.circular(26),
+                      border: Border.all(color: const Color(0x44FFFFFF)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('TEST 2 / 8', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 12),
+                        const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 32, height: 1.08, fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 14),
+                        const Text('Wenn du diese Seite siehst, funktioniert der Wechsel zu Schritt 2 wieder korrekt.', style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 16, height: 1.45)),
+                        const SizedBox(height: 16),
+                        Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _pinkButton('Weiter', () {}),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pinkButton(String label, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      height: 62,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFFFF2E9A),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_rounded, size: 28),
+          ],
+        ),
       ),
     );
   }
