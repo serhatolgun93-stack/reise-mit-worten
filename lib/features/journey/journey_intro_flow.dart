@@ -20,19 +20,30 @@ class JourneyIntroFlow extends StatefulWidget {
 
 class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   bool _showStepTwo = false;
+  final TextEditingController _nameController = TextEditingController();
 
   String get learningGreeting {
     switch (widget.language) {
-      case 'Türkçe': return 'Merhaba!';
-      case 'Ελληνικά': return 'Γεια σου!';
-      default: return 'Hello!';
+      case 'Türkçe':
+        return 'Merhaba!';
+      case 'Ελληνικά':
+        return 'Γεια σου!';
+      default:
+        return 'Hello!';
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.sizeOf(context);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFF050508),
       body: Stack(
         fit: StackFit.expand,
@@ -80,17 +91,27 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(children: [
-                  const Icon(Icons.favorite_rounded, color: Color(0xFFFF2E9A), size: 21),
-                  const SizedBox(width: 8),
-                  Flexible(child: Text(learningGreeting, style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 17, fontWeight: FontWeight.w800))),
-                ]),
+                Row(
+                  children: [
+                    const Icon(Icons.favorite_rounded, color: Color(0xFFFF2E9A), size: 21),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        learningGreeting,
+                        style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 17, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 14),
                 const Text('Maria begrüßt dich', style: TextStyle(color: Colors.white, fontSize: 29, height: 1.08, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 14),
                 const Divider(color: Color(0xCCFF2E9A), thickness: 1.2),
                 const SizedBox(height: 14),
-                const Text('Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.', style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45, fontWeight: FontWeight.w500)),
+                const Text(
+                  'Schön, dass du da bist. Bevor wir gemeinsam auf Reisen gehen, möchte ich dich ein wenig kennenlernen.',
+                  style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45, fontWeight: FontWeight.w500),
+                ),
                 const SizedBox(height: 16),
                 Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
               ],
@@ -107,7 +128,10 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _header('2 / 8', () => setState(() => _showStepTwo = false)),
+        _header('2 / 8', () {
+          FocusScope.of(context).unfocus();
+          setState(() => _showStepTwo = false);
+        }),
         const Spacer(),
         Container(
           padding: const EdgeInsets.all(22),
@@ -116,18 +140,78 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('SCHRITT 2', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
+              const Text('LERNEN WIR UNS KENNEN', style: TextStyle(color: Color(0xFFFF5BAE), fontSize: 16, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
-              const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 32, height: 1.08, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 14),
-              const Text('Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.', style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 16, height: 1.45)),
+              const Text('Wie darf ich dich nennen?', style: TextStyle(color: Colors.white, fontSize: 31, height: 1.08, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 12),
+              const Text(
+                'Dein Name macht deine Reise persönlicher. Maria wird dich während des Lernens damit ansprechen.',
+                style: TextStyle(color: Color(0xFFF2EDF2), fontSize: 15, height: 1.45),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.done,
+                onChanged: (_) => setState(() {}),
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                decoration: InputDecoration(
+                  hintText: 'Dein Vorname',
+                  hintStyle: const TextStyle(color: Color(0xFFAAA3AC)),
+                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFFFF2E9A)),
+                  filled: true,
+                  fillColor: const Color(0xE61E1C22),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: Color(0xFF514A56)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: Color(0xFFFF2E9A), width: 2),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
-              Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Color(0xFFFF5BAE), fontSize: 18, fontWeight: FontWeight.w900)),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: const Color(0xC91E1C22),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFF3C3740)),
+                ),
+                child: Row(
+                  children: [
+                    Text(widget.flag, style: const TextStyle(fontSize: 27)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Du lernst ${widget.language} – Schritt für Schritt und in deinem Tempo.',
+                        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: 18),
-        _pinkButton('Weiter', () {}),
+        _pinkButton(
+          'Weiter',
+          _nameController.text.trim().isEmpty
+              ? null
+              : () {
+                  FocusScope.of(context).unfocus();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Willkommen, ${_nameController.text.trim()}! Schritt 3 folgt als Nächstes.'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+        ),
       ],
     );
   }
@@ -143,13 +227,13 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
   }
 
   BoxDecoration _cardDecoration() => BoxDecoration(
-    color: const Color(0xE817161A),
-    borderRadius: BorderRadius.circular(26),
-    border: Border.all(color: const Color(0x44FFFFFF)),
-    boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 28, offset: Offset(0, 12))],
-  );
+        color: const Color(0xE817161A),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: const Color(0x44FFFFFF)),
+        boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 28, offset: Offset(0, 12))],
+      );
 
-  Widget _pinkButton(String label, VoidCallback onPressed) {
+  Widget _pinkButton(String label, VoidCallback? onPressed) {
     return SizedBox(
       width: double.infinity,
       height: 62,
@@ -157,6 +241,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         onPressed: onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: const Color(0xFFFF2E9A),
+          disabledBackgroundColor: const Color(0x88FF2E9A),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(31)),
         ),
