@@ -23,7 +23,8 @@ class JourneyIntroFlow extends StatefulWidget {
 }
 
 class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
-  bool _showStepTwo = false;
+  int _step = 1;
+  String? _selectedLevel;
   final TextEditingController _nameController = TextEditingController();
 
   String get learningGreeting {
@@ -39,13 +40,21 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
 
   bool get _isLeon => widget.guideKey == 'leon';
 
-  String get _stepOneGuideAsset => _isLeon
-      ? 'assets/characters/leon_invite.png'
-      : 'assets/characters/maria_welcome.png';
-
-  String get _stepTwoGuideAsset => _isLeon
-      ? 'assets/characters/leon_confident.png'
-      : 'assets/characters/maria_confident.png';
+  String get _guideAsset {
+    if (_step == 2) {
+      return _isLeon
+          ? 'assets/characters/leon_confident.png'
+          : 'assets/characters/maria_confident.png';
+    }
+    if (_step == 3) {
+      return _isLeon
+          ? 'assets/characters/leon_relaxed.png'
+          : 'assets/characters/maria_thinking.png';
+    }
+    return _isLeon
+        ? 'assets/characters/leon_invite.png'
+        : 'assets/characters/maria_welcome.png';
+  }
 
   @override
   void dispose() {
@@ -95,13 +104,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
                 landscape ? 24 : 18,
                 landscape ? 10 : 18,
               ),
-              child: _showStepTwo
-                  ? (landscape
-                      ? _stepTwoLandscape(screen)
-                      : _stepTwoPortrait(screen))
-                  : (landscape
-                      ? _stepOneLandscape(screen)
-                      : _stepOnePortrait(screen)),
+              child: _buildStep(screen, landscape),
             ),
           ),
         ],
@@ -109,24 +112,38 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
-  Widget _guideLayer(Size screen, bool landscape) {
-    final asset = _showStepTwo ? _stepTwoGuideAsset : _stepOneGuideAsset;
+  Widget _buildStep(Size screen, bool landscape) {
+    switch (_step) {
+      case 2:
+        return landscape
+            ? _stepTwoLandscape(screen)
+            : _stepTwoPortrait(screen);
+      case 3:
+        return landscape
+            ? _stepThreeLandscape(screen)
+            : _stepThreePortrait(screen);
+      default:
+        return landscape
+            ? _stepOneLandscape(screen)
+            : _stepOnePortrait(screen);
+    }
+  }
 
+  Widget _guideLayer(Size screen, bool landscape) {
     if (landscape) {
+      final onRight = _step == 2;
       return Positioned(
-        left: _showStepTwo ? null : -18,
-        right: _showStepTwo ? -12 : null,
+        left: onRight ? null : (_step == 3 ? -8 : -18),
+        right: onRight ? -12 : null,
         bottom: -6,
         child: IgnorePointer(
           child: SizedBox(
-            width: screen.width * (_showStepTwo ? 0.31 : 0.34),
+            width: screen.width * (_step == 2 ? 0.31 : (_step == 3 ? 0.32 : 0.34)),
             height: screen.height * 0.86,
             child: Image.asset(
-              asset,
+              _guideAsset,
               fit: BoxFit.contain,
-              alignment: _showStepTwo
-                  ? Alignment.bottomRight
-                  : Alignment.bottomLeft,
+              alignment: onRight ? Alignment.bottomRight : Alignment.bottomLeft,
               filterQuality: FilterQuality.high,
               errorBuilder: (_, __, ___) => const SizedBox.shrink(),
             ),
@@ -135,20 +152,19 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
       );
     }
 
+    final onRight = _step == 2;
     return Positioned(
-      left: _showStepTwo ? null : -34,
-      right: _showStepTwo ? -42 : null,
-      bottom: _showStepTwo ? 108 : 138,
+      left: onRight ? null : (_step == 3 ? -28 : -34),
+      right: onRight ? -42 : null,
+      bottom: _step == 2 ? 108 : (_step == 3 ? 122 : 138),
       child: IgnorePointer(
         child: SizedBox(
-          width: screen.width * (_showStepTwo ? 0.61 : 0.67),
-          height: screen.height * (_showStepTwo ? 0.58 : 0.61),
+          width: screen.width * (_step == 2 ? 0.61 : (_step == 3 ? 0.62 : 0.67)),
+          height: screen.height * (_step == 2 ? 0.58 : (_step == 3 ? 0.56 : 0.61)),
           child: Image.asset(
-            asset,
+            _guideAsset,
             fit: BoxFit.contain,
-            alignment: _showStepTwo
-                ? Alignment.bottomRight
-                : Alignment.bottomLeft,
+            alignment: onRight ? Alignment.bottomRight : Alignment.bottomLeft,
             filterQuality: FilterQuality.high,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
@@ -167,7 +183,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           child: _welcomeCard(width: screen.width * 0.68, compact: false),
         ),
         const SizedBox(height: 16),
-        _pinkButton('Weiter', () => setState(() => _showStepTwo = true)),
+        _pinkButton('Weiter', () => setState(() => _step = 2)),
       ],
     );
   }
@@ -188,7 +204,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             width: screen.width * 0.48,
             child: _pinkButton(
               'Weiter',
-              () => setState(() => _showStepTwo = true),
+              () => setState(() => _step = 2),
               height: 50,
             ),
           ),
@@ -389,10 +405,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
             ),
             child: Row(
               children: [
-                Text(
-                  widget.flag,
-                  style: TextStyle(fontSize: compact ? 22 : 24),
-                ),
+                Text(widget.flag, style: TextStyle(fontSize: compact ? 22 : 24)),
                 const SizedBox(width: 9),
                 Expanded(
                   child: Text(
@@ -413,9 +426,189 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
     );
   }
 
+  Widget _stepThreePortrait(Size screen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _header('3 / 8', _backToStepTwo),
+        const Spacer(),
+        Align(
+          alignment: Alignment.centerRight,
+          child: _levelCard(width: screen.width * 0.72, compact: false),
+        ),
+        const SizedBox(height: 16),
+        _continueLevelButton(),
+      ],
+    );
+  }
+
+  Widget _stepThreeLandscape(Size screen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _header('3 / 8', _backToStepTwo),
+        const Spacer(),
+        Align(
+          alignment: Alignment.centerRight,
+          child: _levelCard(width: screen.width * 0.64, compact: true),
+        ),
+        const SizedBox(height: 9),
+        Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            width: screen.width * 0.47,
+            child: _continueLevelButton(height: 50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _levelCard({required double width, required bool compact}) {
+    return Container(
+      width: width,
+      padding: EdgeInsets.all(compact ? 16 : 18),
+      decoration: _cardDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'DEIN STARTPUNKT',
+            style: TextStyle(
+              color: const Color(0xFFFF5BAE),
+              fontSize: compact ? 13.5 : 14.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: compact ? 5 : 8),
+          Text(
+            'Wo stehst du gerade?',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 24 : 27,
+              height: 1.07,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: compact ? 5 : 8),
+          Text(
+            '${widget.guideName} passt deine ersten Schritte an dein aktuelles Niveau an.',
+            style: TextStyle(
+              color: const Color(0xFFF2EDF2),
+              fontSize: compact ? 12.5 : 13.5,
+              height: 1.3,
+            ),
+          ),
+          SizedBox(height: compact ? 8 : 12),
+          _levelOption(
+            'new',
+            Icons.auto_awesome_rounded,
+            'Ich starte ganz neu',
+            'Keine oder fast keine Vorkenntnisse',
+            compact,
+          ),
+          SizedBox(height: compact ? 6 : 8),
+          _levelOption(
+            'words',
+            Icons.chat_bubble_outline_rounded,
+            'Ich kenne ein paar Wörter',
+            'Begrüßungen und einzelne Begriffe sind mir vertraut',
+            compact,
+          ),
+          SizedBox(height: compact ? 6 : 8),
+          _levelOption(
+            'sentences',
+            Icons.record_voice_over_rounded,
+            'Ich kann einfache Sätze',
+            'Kurze Alltagssituationen klappen schon',
+            compact,
+          ),
+          SizedBox(height: compact ? 6 : 8),
+          _levelOption(
+            'restart',
+            Icons.refresh_rounded,
+            'Ich möchte wieder einsteigen',
+            'Ich habe früher gelernt und möchte auffrischen',
+            compact,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _levelOption(
+    String value,
+    IconData icon,
+    String title,
+    String subtitle,
+    bool compact,
+  ) {
+    final selected = _selectedLevel == value;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => setState(() => _selectedLevel = value),
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 11 : 12,
+            vertical: compact ? 8 : 10,
+          ),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0x3DFF2E9A) : const Color(0xC91E1C22),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? const Color(0xFFFF2E9A) : const Color(0xFF3C3740),
+              width: selected ? 1.8 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: const Color(0xFFFF2E9A), size: compact ? 21 : 23),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: compact ? 12.5 : 13.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: const Color(0xFFD7D0D7),
+                        fontSize: compact ? 10.5 : 11.5,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (selected)
+                const Icon(Icons.check_circle_rounded, color: Color(0xFFFF2E9A), size: 21),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _backToStepOne() {
     FocusScope.of(context).unfocus();
-    setState(() => _showStepTwo = false);
+    setState(() => _step = 1);
+  }
+
+  void _backToStepTwo() {
+    FocusScope.of(context).unfocus();
+    setState(() => _step = 2);
   }
 
   Widget _continueNameButton({double height = 62}) {
@@ -425,10 +618,22 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
           ? null
           : () {
               FocusScope.of(context).unfocus();
+              setState(() => _step = 3);
+            },
+      height: height,
+    );
+  }
+
+  Widget _continueLevelButton({double height = 62}) {
+    return _pinkButton(
+      'Weiter',
+      _selectedLevel == null
+          ? null
+          : () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Willkommen, ${_nameController.text.trim()}! ${widget.guideName} begleitet dich weiter. Schritt 3 folgt als Nächstes.',
+                    'Danke, ${_nameController.text.trim()}! Dein Startpunkt ist gespeichert. Schritt 4 folgt als Nächstes.',
                   ),
                   behavior: SnackBarBehavior.floating,
                 ),
