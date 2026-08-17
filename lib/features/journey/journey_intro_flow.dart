@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'maria_asset_v2.dart';
-
 class JourneyIntroFlow extends StatefulWidget {
   final String language;
   final String flag;
@@ -56,24 +54,6 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
               ),
             ),
           ),
-          if (!_showStepTwo)
-            Positioned(
-              left: -14,
-              bottom: 96,
-              child: SizedBox(
-                width: screen.width * 0.55,
-                height: screen.height * 0.57,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomLeft,
-                  child: Image.memory(
-                    mariaWelcomePngBytes,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  ),
-                ),
-              ),
-            ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
@@ -93,7 +73,7 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
         Align(
           alignment: Alignment.centerRight,
           child: Container(
-            width: screen.width * 0.64,
+            width: screen.width * 0.72,
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
             decoration: _cardDecoration(),
             child: Column(
