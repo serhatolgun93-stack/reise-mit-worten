@@ -32,6 +32,4 @@ flutter:
     - assets/content/
     - assets/characters/
     - assets/audio/
-    - assets/backgrounds/english_london.png
-    - assets/backgrounds/turkish_istanbul.png
-    - assets/backgrounds/greek_santorini.png
+    - assets/backgrounds/
