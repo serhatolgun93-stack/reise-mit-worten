@@ -56,7 +56,18 @@ class _JourneyIntroFlowState extends State<JourneyIntroFlow> {
 
   Widget _guideLayer(Size s,bool l) {
     final right=_step==2;
-    return Positioned(left:right?null:(l?-12:-28), right:right?(l?-8:-32):null, bottom:l?-10:(_step==3?105:120), child:IgnorePointer(child:SizedBox(width:l?s.width*(_step==3?.27:.32):s.width*(_step==3?.43:.62),height:l?s.height*.88:s.height*(_step==3?.43:.58),child:Image.asset(_guideAsset,fit:BoxFit.contain,alignment:right?Alignment.bottomRight:Alignment.bottomLeft,errorBuilder:(_,__,___)=>const SizedBox.shrink()))));
+    return Positioned(
+      left:right?null:(l?-12:-28),
+      right:right?(l?-8:-32):null,
+      bottom:l?-10:(_step==3?105:120),
+      child:IgnorePointer(
+        child:SizedBox(
+          width:l ? s.width * (_step == 3 ? 0.27 : 0.32) : s.width * (_step == 3 ? 0.43 : 0.62),
+          height:l ? s.height * 0.88 : s.height * (_step == 3 ? 0.43 : 0.58),
+          child:Image.asset(_guideAsset,fit:BoxFit.contain,alignment:right?Alignment.bottomRight:Alignment.bottomLeft,errorBuilder:(_,__,___)=>const SizedBox.shrink()),
+        ),
+      ),
+    );
   }
 
   Widget _stepOnePortrait(Size s)=>Column(children:[_header('1 / 8',()=>Navigator.of(context).pop()),const Spacer(),Align(alignment:Alignment.centerRight,child:_welcomeCard(s.width*.68,false)),const SizedBox(height:16),_pinkButton('Weiter',()=>setState(()=>_step=2))]);
