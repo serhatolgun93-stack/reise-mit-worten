@@ -24,8 +24,7 @@ class JourneyGateTransitionScreen extends StatefulWidget {
   });
 
   @override
-  State<JourneyGateTransitionScreen> createState() =>
-      _JourneyGateTransitionScreenState();
+  State<JourneyGateTransitionScreen> createState() => _JourneyGateTransitionScreenState();
 }
 
 class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScreen>
@@ -35,31 +34,19 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
   Timer? _finishTimer;
 
   String get _destinationAsset {
-    if (widget.language == 'Türkçe') {
-      return 'assets/backgrounds/gate_turkish.jpg';
-    }
-    if (widget.language == 'Ελληνικά') {
-      return 'assets/backgrounds/gate_greek.jpg';
-    }
+    if (widget.language == 'Türkçe') return 'assets/backgrounds/gate_turkish.jpg';
+    if (widget.language == 'Ελληνικά') return 'assets/backgrounds/gate_greek.jpg';
     return 'assets/backgrounds/gate_english.jpg';
   }
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1900),
-    );
-    _open = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutCubic,
-    );
-
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1900));
+    _open = CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic);
     Future<void>.delayed(const Duration(milliseconds: 420), () {
       if (mounted) _controller.forward();
     });
-
     _finishTimer = Timer(const Duration(milliseconds: 2850), _finish);
   }
 
@@ -94,8 +81,8 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final landscape = size.width > size.height;
-    final gateWidth = landscape ? size.width * .44 : size.width * .80;
-    final gateHeight = landscape ? size.height * .78 : size.height * .60;
+    final gateWidth = landscape ? size.width * .46 : size.width * .82;
+    final gateHeight = landscape ? size.height * .76 : size.height * .57;
 
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
@@ -105,27 +92,15 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
           Image.asset(
             _destinationAsset,
             fit: BoxFit.cover,
-            alignment: Alignment.center,
             filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => Image.asset(
-              widget.backgroundAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.high,
-            ),
+            errorBuilder: (_, __, ___) => Image.asset(widget.backgroundAsset, fit: BoxFit.cover),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x30000000),
-                  Color(0x08000000),
-                  Color(0x26000000),
-                  Color(0x77000000),
-                ],
-                stops: [0, .28, .68, 1],
+                colors: [Color(0x26000000), Color(0x08000000), Color(0x20000000), Color(0x66000000)],
               ),
             ),
           ),
@@ -135,95 +110,40 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
               height: gateHeight,
               child: AnimatedBuilder(
                 animation: _open,
-                builder: (context, _) => _Gate(
-                  openAmount: _open.value,
-                  compact: landscape,
-                ),
+                builder: (_, __) => _GardenGate(openAmount: _open.value, compact: landscape),
               ),
             ),
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                landscape ? 24 : 18,
-                landscape ? 10 : 16,
-                landscape ? 24 : 18,
-                landscape ? 12 : 20,
-              ),
+              padding: EdgeInsets.fromLTRB(landscape ? 24 : 18, landscape ? 10 : 16, landscape ? 24 : 18, landscape ? 12 : 20),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.travel_explore_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
+                      const Icon(Icons.travel_explore_rounded, color: Colors.white, size: 28),
                       const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Reise mit Worten',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '${widget.flag} ${widget.language}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                      const Expanded(child: Text('Reise mit Worten', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900))),
+                      Text('${widget.flag} ${widget.language}', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
                     ],
                   ),
                   const Spacer(),
                   AnimatedBuilder(
                     animation: _open,
-                    builder: (context, _) {
-                      final opened = _open.value > .42;
-                      return AnimatedOpacity(
-                        duration: const Duration(milliseconds: 320),
-                        opacity: _open.value > .92 ? .72 : 1,
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth: landscape ? 560 : 520,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: landscape ? 24 : 20,
-                            vertical: landscape ? 9 : 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xB8141318),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0x55FFFFFF),
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x66000000),
-                                blurRadius: 18,
-                                offset: Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            opened
-                                ? 'Deine Reise beginnt, ${widget.name}.'
-                                : 'Das Tor zu deiner neuen Sprache öffnet sich …',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: landscape ? 14.5 : 16.5,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    builder: (_, __) => Container(
+                      constraints: BoxConstraints(maxWidth: landscape ? 560 : 520),
+                      padding: EdgeInsets.symmetric(horizontal: landscape ? 24 : 20, vertical: landscape ? 9 : 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xB8141318),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: const Color(0x55FFFFFF)),
+                      ),
+                      child: Text(
+                        _open.value > .42 ? 'Deine Reise beginnt, ${widget.name}.' : 'Das Tor zu deiner neuen Sprache öffnet sich …',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: landscape ? 14.5 : 16.5, fontWeight: FontWeight.w800),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -235,125 +155,53 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
   }
 }
 
-class _Gate extends StatelessWidget {
+class _GardenGate extends StatelessWidget {
   final double openAmount;
   final bool compact;
-
-  const _Gate({
-    required this.openAmount,
-    required this.compact,
-  });
+  const _GardenGate({required this.openAmount, required this.compact});
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(compact ? 28 : 34);
-    final frameWidth = compact ? 10.0 : 13.0;
-
+    const metal = Color(0xFF24211D);
+    const bronze = Color(0xFFB99155);
     return Stack(
-      fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            border: Border.all(
-              color: const Color(0xFFE8D8BA),
-              width: frameWidth,
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x99000000),
-                blurRadius: 30,
-                spreadRadius: 4,
-              ),
-              BoxShadow(
-                color: Color(0x55FFD99C),
-                blurRadius: 25,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
+        Positioned(left: 0, top: 28, bottom: 0, width: compact ? 24 : 30, child: _StonePost()),
+        Positioned(right: 0, top: 28, bottom: 0, width: compact ? 24 : 30, child: _StonePost()),
+        Positioned(
+          left: compact ? 14 : 18,
+          right: compact ? 14 : 18,
+          top: 0,
+          height: compact ? 66 : 82,
+          child: CustomPaint(painter: _ArchPainter(metal: metal, bronze: bronze)),
         ),
         Positioned(
-          top: compact ? -25 : -31,
-          left: compact ? 24 : 28,
-          right: compact ? 24 : 28,
-          child: Container(
-            height: compact ? 46 : 56,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1460A8),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFE8D8BA),
-                width: compact ? 3 : 4,
+          left: compact ? 22 : 28,
+          right: compact ? 22 : 28,
+          top: compact ? 54 : 68,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xE622201D),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: bronze, width: 1.5),
               ),
-              boxShadow: const [
-                BoxShadow(color: Color(0x66000000), blurRadius: 10),
-              ],
-            ),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Text(
-                  'REISE MIT WORTEN',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: compact ? 14 : 17,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              ),
+              child: const Text('REISE MIT WORTEN', style: TextStyle(color: Color(0xFFF4E6C9), fontWeight: FontWeight.w900, letterSpacing: 1.2)),
             ),
           ),
         ),
         Positioned.fill(
-          child: Padding(
-            padding: EdgeInsets.all(frameWidth),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _DoorLeaf(
-                        left: true,
-                        openAmount: openAmount,
-                      ),
-                    ),
-                    Expanded(
-                      child: _DoorLeaf(
-                        left: false,
-                        openAmount: openAmount,
-                      ),
-                    ),
-                  ],
-                ),
-                IgnorePointer(
-                  child: Center(
-                    child: AnimatedOpacity(
-                      opacity: (1 - openAmount * 1.45).clamp(0.0, 1.0),
-                      duration: const Duration(milliseconds: 80),
-                      child: Container(
-                        width: compact ? 3 : 4,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFFE2A8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xCCFFD36A),
-                              blurRadius: 16,
-                              spreadRadius: 4,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          top: compact ? 82 : 100,
+          left: compact ? 22 : 28,
+          right: compact ? 22 : 28,
+          bottom: 8,
+          child: Row(
+            children: [
+              Expanded(child: _IronLeaf(left: true, openAmount: openAmount)),
+              Expanded(child: _IronLeaf(left: false, openAmount: openAmount)),
+            ],
           ),
         ),
       ],
@@ -361,87 +209,87 @@ class _Gate extends StatelessWidget {
   }
 }
 
-class _DoorLeaf extends StatelessWidget {
+class _StonePost extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(
+    decoration: BoxDecoration(
+      color: const Color(0xFFD8C9AE),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: const Color(0xFFF0E4CC), width: 2),
+      boxShadow: const [BoxShadow(color: Color(0x77000000), blurRadius: 12, offset: Offset(0, 5))],
+    ),
+  );
+}
+
+class _IronLeaf extends StatelessWidget {
   final bool left;
   final double openAmount;
-
-  const _DoorLeaf({
-    required this.left,
-    required this.openAmount,
-  });
+  const _IronLeaf({required this.left, required this.openAmount});
 
   @override
   Widget build(BuildContext context) {
-    final angle = openAmount * (math.pi / 2.15) * (left ? -1 : 1);
-    final alignment = left ? Alignment.centerLeft : Alignment.centerRight;
-
+    final angle = openAmount * (math.pi / 2.1) * (left ? -1 : 1);
     return Transform(
-      alignment: alignment,
-      transform: Matrix4.identity()
-        ..setEntry(3, 2, .0018)
-        ..rotateY(angle),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1767B6),
-              borderRadius: BorderRadius.only(
-                topLeft: left ? const Radius.circular(18) : Radius.zero,
-                bottomLeft: left ? const Radius.circular(18) : Radius.zero,
-                topRight: left ? Radius.zero : const Radius.circular(18),
-                bottomRight: left ? Radius.zero : const Radius.circular(18),
-              ),
-              border: Border.all(
-                color: const Color(0xFF8ABCE8),
-                width: 2,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x88000000),
-                  blurRadius: 12,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                for (var i = 1; i < 5; i++)
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    top: constraints.maxHeight * (i / 5),
-                    child: Container(
-                      height: 2,
-                      color: const Color(0x558ABCE8),
-                    ),
-                  ),
-                Positioned(
-                  right: left ? 12 : null,
-                  left: left ? null : 12,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: Container(
-                      width: 9,
-                      height: 9,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFFFFD36A),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xAAFFD36A),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+      alignment: left ? Alignment.centerLeft : Alignment.centerRight,
+      transform: Matrix4.identity()..setEntry(3, 2, .0018)..rotateY(angle),
+      child: CustomPaint(
+        painter: _IronGatePainter(left: left),
+        child: const SizedBox.expand(),
       ),
     );
   }
+}
+
+class _IronGatePainter extends CustomPainter {
+  final bool left;
+  const _IronGatePainter({required this.left});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final iron = Paint()..color = const Color(0xFF24211D)..strokeWidth = 5..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
+    final bronze = Paint()..color = const Color(0xFFB99155)..strokeWidth = 2.2..style = PaintingStyle.stroke;
+    final frame = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(6));
+    canvas.drawRRect(frame, iron);
+    final count = size.width < 150 ? 5 : 7;
+    for (var i = 1; i < count; i++) {
+      final x = size.width * i / count;
+      canvas.drawLine(Offset(x, size.height), Offset(x, 28), iron);
+      final path = Path()..moveTo(x - 7, 30)..lineTo(x, 8)..lineTo(x + 7, 30);
+      canvas.drawPath(path, iron);
+    }
+    canvas.drawLine(Offset(0, size.height * .34), Offset(size.width, size.height * .34), iron);
+    canvas.drawLine(Offset(0, size.height * .68), Offset(size.width, size.height * .68), iron);
+    final cx = left ? size.width * .72 : size.width * .28;
+    final cy = size.height * .51;
+    canvas.drawCircle(Offset(cx, cy), math.min(size.width, size.height) * .14, bronze);
+    canvas.drawCircle(Offset(cx, cy), math.min(size.width, size.height) * .08, bronze);
+    canvas.drawLine(Offset(cx - 22, cy), Offset(cx + 22, cy), bronze);
+    canvas.drawLine(Offset(cx, cy - 22), Offset(cx, cy + 22), bronze);
+  }
+
+  @override
+  bool shouldRepaint(covariant _IronGatePainter oldDelegate) => false;
+}
+
+class _ArchPainter extends CustomPainter {
+  final Color metal;
+  final Color bronze;
+  const _ArchPainter({required this.metal, required this.bronze});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = metal..strokeWidth = 7..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
+    final accent = Paint()..color = bronze..strokeWidth = 2..style = PaintingStyle.stroke;
+    final arch = Path()
+      ..moveTo(0, size.height)
+      ..quadraticBezierTo(size.width * .5, -size.height * .72, size.width, size.height);
+    canvas.drawPath(arch, p);
+    final inner = Path()
+      ..moveTo(10, size.height)
+      ..quadraticBezierTo(size.width * .5, -size.height * .45, size.width - 10, size.height);
+    canvas.drawPath(inner, accent);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArchPainter oldDelegate) => false;
 }
