@@ -73,6 +73,16 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
+      - name: Generate Reise mit Worten app icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f assets/app_icon.png ]]; then
+            dart run flutter_launcher_icons
+          else
+            echo "assets/app_icon.png not found; keeping current launcher icon for this build."
+          fi
+
       - name: Analyze
         run: flutter analyze
 
@@ -173,6 +183,16 @@ jobs:
 
       - name: Resolve dependencies
         run: flutter pub get
+
+      - name: Generate Reise mit Worten app icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f assets/app_icon.png ]]; then
+            dart run flutter_launcher_icons
+          else
+            echo "assets/app_icon.png not found; keeping current launcher icon for this build."
+          fi
 
       - name: iOS unsigned debug build
         run: flutter build ios --debug --no-codesign
