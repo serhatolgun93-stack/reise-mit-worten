@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -48,16 +49,16 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3200),
+      duration: const Duration(milliseconds: 3400),
     );
     _open = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOutCubic,
     );
-    Future<void>.delayed(const Duration(milliseconds: 700), () {
+    Future<void>.delayed(const Duration(milliseconds: 800), () {
       if (mounted) _controller.forward();
     });
-    _finishTimer = Timer(const Duration(milliseconds: 4400), _finish);
+    _finishTimer = Timer(const Duration(milliseconds: 4800), _finish);
   }
 
   @override
@@ -109,10 +110,7 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
           ),
           AnimatedBuilder(
             animation: _open,
-            builder: (_, __) => _FullscreenGate(
-              openAmount: _open.value,
-              destinationAsset: _destinationAsset,
-            ),
+            builder: (_, __) => _GateScene(openAmount: _open.value),
           ),
           SafeArea(
             child: Padding(
@@ -153,26 +151,30 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
                     ],
                   ),
                   const Spacer(),
-                  Container(
-                    constraints: BoxConstraints(maxWidth: landscape ? 560 : 520),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: landscape ? 24 : 20,
-                      vertical: landscape ? 9 : 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xB8141318),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: const Color(0x55FFFFFF)),
-                    ),
-                    child: Text(
-                      _open.value > .42
-                          ? 'Deine Reise beginnt, ${widget.name}.'
-                          : 'Das Tor zu deiner neuen Sprache öffnet sich …',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: landscape ? 14.5 : 16.5,
-                        fontWeight: FontWeight.w800,
+                  AnimatedOpacity(
+                    opacity: _open.value > .92 ? 0 : 1,
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: landscape ? 560 : 520),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: landscape ? 24 : 20,
+                        vertical: landscape ? 9 : 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xB8141318),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: const Color(0x55FFFFFF)),
+                      ),
+                      child: Text(
+                        _open.value > .42
+                            ? 'Deine Reise beginnt, ${widget.name}.'
+                            : 'Das Tor zu deiner neuen Sprache öffnet sich …',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: landscape ? 14.5 : 16.5,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
@@ -186,95 +188,202 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
   }
 }
 
-class _FullscreenGate extends StatelessWidget {
+class _GateScene extends StatelessWidget {
   final double openAmount;
-  final String destinationAsset;
 
-  const _FullscreenGate({
-    required this.openAmount,
-    required this.destinationAsset,
-  });
+  const _GateScene({required this.openAmount});
+
+  static const double canvasWidth = 1404;
+  static const double canvasHeight = 1536;
+  static const double doorLeft = 320;
+  static const double doorCenter = 702;
+  static const double doorRight = 1084;
+  static const double doorTop = 405;
+  static const double doorBottom = 1130;
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final landscape = size.width > size.height;
-    final reveal = Curves.easeInOutCubic.transform(openAmount);
-    final slitOpacity = ((openAmount - .03) / .18).clamp(0.0, 1.0) *
-        (1 - ((openAmount - .24) / .22).clamp(0.0, 1.0));
+    final fade = (1 - ((openAmount - .86) / .14).clamp(0.0, 1.0));
+    final angle = openAmount * (math.pi / 2.7);
+    final slitOpacity = ((openAmount - .03) / .14).clamp(0.0, 1.0) *
+        (1 - ((openAmount - .18) / .16).clamp(0.0, 1.0));
 
-    final slitTop = size.height * (landscape ? .305 : .335);
-    final slitBottom = size.height * (landscape ? .895 : .865);
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          'assets/journey_gate.png',
-          fit: BoxFit.cover,
-          alignment: Alignment.center,
-          filterQuality: FilterQuality.high,
-        ),
-        Opacity(
-          opacity: reveal,
-          child: ClipPath(
-            clipper: _DoorRevealClipper(openAmount, landscape),
-            child: Image.asset(
-              destinationAsset,
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.high,
-            ),
-          ),
-        ),
-        if (slitOpacity > 0)
-          Positioned(
-            left: size.width / 2 - 1.5,
-            top: slitTop,
-            width: 3,
-            height: (slitBottom - slitTop).clamp(0.0, size.height),
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: slitOpacity,
-                child: const DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFE5A6),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xCCFFD36A),
-                        blurRadius: 14,
-                        spreadRadius: 4,
-                      ),
-                    ],
+    return Opacity(
+      opacity: fade,
+      child: FittedBox(
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: canvasWidth,
+          height: canvasHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ClipPath(
+                clipper: const _FrameClipper(),
+                child: Image.asset(
+                  'assets/journey_gate.png',
+                  width: canvasWidth,
+                  height: canvasHeight,
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+              Positioned(
+                left: doorLeft,
+                top: doorTop,
+                width: doorCenter - doorLeft,
+                height: doorBottom - doorTop,
+                child: Transform(
+                  alignment: Alignment.centerLeft,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, .0018)
+                    ..rotateY(-angle),
+                  child: ClipPath(
+                    clipper: const _LeftDoorClipper(),
+                    child: _DoorCrop(
+                      sourceLeft: doorLeft,
+                      sourceTop: doorTop,
+                    ),
                   ),
                 ),
               ),
-            ),
+              Positioned(
+                left: doorCenter,
+                top: doorTop,
+                width: doorRight - doorCenter,
+                height: doorBottom - doorTop,
+                child: Transform(
+                  alignment: Alignment.centerRight,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, .0018)
+                    ..rotateY(angle),
+                  child: ClipPath(
+                    clipper: const _RightDoorClipper(),
+                    child: _DoorCrop(
+                      sourceLeft: doorCenter,
+                      sourceTop: doorTop,
+                    ),
+                  ),
+                ),
+              ),
+              if (slitOpacity > 0)
+                Positioned(
+                  left: doorCenter - 2,
+                  top: doorTop + 6,
+                  width: 4,
+                  height: doorBottom - doorTop - 10,
+                  child: Opacity(
+                    opacity: slitOpacity,
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFE6AE),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xCCFFD36A),
+                            blurRadius: 18,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 }
 
-class _DoorRevealClipper extends CustomClipper<Path> {
-  final double openAmount;
-  final bool landscape;
+class _DoorCrop extends StatelessWidget {
+  final double sourceLeft;
+  final double sourceTop;
 
-  const _DoorRevealClipper(this.openAmount, this.landscape);
+  const _DoorCrop({
+    required this.sourceLeft,
+    required this.sourceTop,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.topLeft,
+        minWidth: _GateScene.canvasWidth,
+        maxWidth: _GateScene.canvasWidth,
+        minHeight: _GateScene.canvasHeight,
+        maxHeight: _GateScene.canvasHeight,
+        child: Transform.translate(
+          offset: Offset(-sourceLeft, -sourceTop),
+          child: Image.asset(
+            'assets/journey_gate.png',
+            width: _GateScene.canvasWidth,
+            height: _GateScene.canvasHeight,
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.high,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FrameClipper extends CustomClipper<Path> {
+  const _FrameClipper();
 
   @override
   Path getClip(Size size) {
-    final p = Curves.easeInOutCubic.transform(openAmount);
-    final maxWidth = size.width * (landscape ? .58 : .72);
-    final revealWidth = maxWidth * p;
-    final left = (size.width - revealWidth) / 2;
-    final top = size.height * (landscape ? .29 : .32);
-    final bottom = size.height * (landscape ? .91 : .88);
-    return Path()
-      ..addRect(Rect.fromLTRB(left, top, left + revealWidth, bottom));
+    final path = Path()..fillType = PathFillType.evenOdd;
+    path.addRect(Offset.zero & size);
+    path.moveTo(_GateScene.doorLeft, 492);
+    path.quadraticBezierTo(
+      _GateScene.doorCenter,
+      330,
+      _GateScene.doorRight,
+      492,
+    );
+    path.lineTo(_GateScene.doorRight, _GateScene.doorBottom);
+    path.lineTo(_GateScene.doorLeft, _GateScene.doorBottom);
+    path.close();
+    return path;
   }
 
   @override
-  bool shouldReclip(covariant _DoorRevealClipper oldClipper) =>
-      oldClipper.openAmount != openAmount || oldClipper.landscape != landscape;
+  bool shouldReclip(covariant _FrameClipper oldClipper) => false;
+}
+
+class _LeftDoorClipper extends CustomClipper<Path> {
+  const _LeftDoorClipper();
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(0, 87)
+      ..quadraticBezierTo(size.width * .52, 0, size.width, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant _LeftDoorClipper oldClipper) => false;
+}
+
+class _RightDoorClipper extends CustomClipper<Path> {
+  const _RightDoorClipper();
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(0, 0)
+      ..quadraticBezierTo(size.width * .48, 0, size.width, 87)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant _RightDoorClipper oldClipper) => false;
 }
