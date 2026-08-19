@@ -18,11 +18,11 @@ class JourneyDashboardScreen extends StatelessWidget {
     required this.backgroundAsset,
   });
 
-  bool get _isLeon => guideKey == 'leon';
-
-  String get _guideAsset => _isLeon
-      ? 'assets/characters/leon_invite.png'
-      : 'assets/characters/maria_welcome.png';
+  String get _chapterBackground {
+    if (language == 'Türkçe') return 'assets/backgrounds/gate_turkish.jpg';
+    if (language == 'Ελληνικά') return 'assets/backgrounds/gate_greek.jpg';
+    return 'assets/backgrounds/gate_english.jpg';
+  }
 
   String get _chapterTitle {
     if (language == 'Türkçe') return 'Ankommen & Begrüßen';
@@ -36,55 +36,38 @@ class JourneyDashboardScreen extends StatelessWidget {
     final landscape = size.width > size.height;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF050508),
       body: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset(
-            backgroundAsset,
+            _chapterBackground,
             fit: BoxFit.cover,
             alignment: Alignment.center,
             filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF09090C)),
+            errorBuilder: (_, __, ___) => Image.asset(
+              backgroundAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x22000000),
-                  Color(0x33000000),
-                  Color(0xA8000000),
-                  Color(0xF0000000),
-                ],
-                stops: [0.0, 0.38, 0.72, 1.0],
-              ),
-            ),
-          ),
-          Positioned(
-            left: landscape ? -10 : -34,
-            bottom: landscape ? -18 : 72,
-            child: IgnorePointer(
-              child: SizedBox(
-                width: landscape ? size.width * .30 : size.width * .48,
-                height: landscape ? size.height * .82 : size.height * .48,
-                child: Image.asset(
-                  _guideAsset,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomLeft,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                ),
+                colors: [Color(0x12000000), Color(0x08000000), Color(0x78000000)],
+                stops: [0, .52, 1],
               ),
             ),
           ),
           SafeArea(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
-                landscape ? 26 : 18,
-                landscape ? 10 : 16,
-                landscape ? 26 : 18,
-                landscape ? 12 : 18,
+                landscape ? 24 : 18,
+                landscape ? 8 : 12,
+                landscape ? 24 : 18,
+                landscape ? 10 : 18,
               ),
               child: landscape
                   ? _landscapeContent(context, size)
@@ -105,11 +88,11 @@ class JourneyDashboardScreen extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: size.width * .69,
-            child: _mainCard(context, compact: false),
+            width: size.width * .72,
+            child: _chapterCard(context, compact: false),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         _quickAccess(compact: false),
       ],
     );
@@ -124,15 +107,15 @@ class JourneyDashboardScreen extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: size.width * .58,
-            child: _mainCard(context, compact: true),
+            width: size.width * .60,
+            child: _chapterCard(context, compact: true),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 7),
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: size.width * .58,
+            width: size.width * .60,
             child: _quickAccess(compact: true),
           ),
         ),
@@ -140,48 +123,36 @@ class JourneyDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _header() {
-    return Row(
-      children: [
-        const Icon(Icons.travel_explore_rounded, color: Colors.white, size: 30),
-        const SizedBox(width: 8),
-        const Expanded(
-          child: Text(
-            'Reise mit Worten',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+  Widget _header() => Row(
+        children: [
+          const Icon(Icons.travel_explore_rounded, color: Colors.white, size: 30),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'Reise mit Worten',
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
             ),
           ),
-        ),
-        Text(
-          '$flag  $language',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _mainCard(BuildContext context, {required bool compact}) {
-    return Container(
-      padding: EdgeInsets.all(compact ? 16 : 19),
-      decoration: BoxDecoration(
-        color: const Color(0xE817161A),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0x44FFFFFF)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x77000000),
-            blurRadius: 28,
-            offset: Offset(0, 12),
+          Text(
+            '$flag  $language',
+            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800),
           ),
         ],
-      ),
+      );
+
+  BoxDecoration _cardDecoration({double radius = 26}) => BoxDecoration(
+        color: const Color(0xD917161A),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: const Color(0x44FFFFFF)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      );
+
+  Widget _chapterCard(BuildContext context, {required bool compact}) {
+    return Container(
+      padding: EdgeInsets.all(compact ? 15 : 18),
+      decoration: _cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -194,122 +165,88 @@ class JourneyDashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: compact ? 4 : 6),
           Text(
             'Willkommen, $name!',
             style: TextStyle(
               color: Colors.white,
-              fontSize: compact ? 25 : 29,
+              fontSize: compact ? 24 : 28,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: compact ? 4 : 7),
           Text(
             '$guideName begleitet dich. Heute beginnt dein erstes Kapitel.',
             style: TextStyle(
-              color: const Color(0xFFF0EAF0),
+              color: const Color(0xFFF2EDF2),
               fontSize: compact ? 11.5 : 13,
               height: 1.3,
             ),
           ),
-          SizedBox(height: compact ? 10 : 14),
-          Container(
-            padding: EdgeInsets.all(compact ? 12 : 14),
-            decoration: BoxDecoration(
-              color: const Color(0xD91E1C22),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x66FFFFFF)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          SizedBox(height: compact ? 9 : 12),
+          Row(
+            children: [
+              const Icon(Icons.waving_hand_rounded, color: Color(0xFFFF2E9A), size: 24),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: const BoxDecoration(
-                        color: Color(0x33FF2E9A),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.waving_hand_rounded,
-                        color: Color(0xFFFF2E9A),
-                      ),
+                    const Text(
+                      'Kapitel 1',
+                      style: TextStyle(color: Color(0xFFFF5BAE), fontWeight: FontWeight.w900),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Kapitel 1',
-                            style: TextStyle(
-                              color: Color(0xFFFF5BAE),
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          Text(
-                            _chapterTitle,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: compact ? 17 : 19,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      _chapterTitle,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: compact ? 17 : 19,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: const LinearProgressIndicator(
-                    value: 0,
-                    minHeight: 7,
-                    backgroundColor: Color(0xFF3B373E),
-                    valueColor: AlwaysStoppedAnimation(Color(0xFFFF2E9A)),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  '0 % abgeschlossen',
-                  style: TextStyle(color: Color(0xFFD8D0D7), fontSize: 10.5),
-                ),
-                SizedBox(height: compact ? 9 : 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 46 : 54,
-                  child: FilledButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Kapitel 1 wird als Nächstes aufgebaut.'),
-                        ),
-                      );
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF2E9A),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Reise starten',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
-                        ),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_forward_rounded),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          SizedBox(height: compact ? 9 : 11),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: const LinearProgressIndicator(
+              value: 0,
+              minHeight: 7,
+              backgroundColor: Color(0xFF3B373E),
+              valueColor: AlwaysStoppedAnimation(Color(0xFFFF2E9A)),
+            ),
+          ),
+          const SizedBox(height: 5),
+          const Text(
+            '0 % abgeschlossen',
+            style: TextStyle(color: Color(0xFFD8D0D7), fontSize: 10.5),
+          ),
+          SizedBox(height: compact ? 9 : 12),
+          SizedBox(
+            width: double.infinity,
+            height: compact ? 46 : 54,
+            child: FilledButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Kapitel 1 wird als Nächstes aufgebaut.')),
+                );
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFFFF2E9A),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Reise starten', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                  SizedBox(width: 10),
+                  Icon(Icons.arrow_forward_rounded),
+                ],
+              ),
             ),
           ),
         ],
@@ -323,26 +260,17 @@ class JourneyDashboardScreen extends StatelessWidget {
       (icon: Icons.menu_book_rounded, label: 'Sprachbuch'),
       (icon: Icons.folder_copy_outlined, label: 'Sprachordner'),
     ];
-
     return Row(
       children: [
         for (var i = 0; i < items.length; i++) ...[
           Expanded(
             child: Container(
               height: compact ? 54 : 66,
-              decoration: BoxDecoration(
-                color: const Color(0xD917161A),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0x44FFFFFF)),
-              ),
+              decoration: _cardDecoration(radius: 18),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    items[i].icon,
-                    color: const Color(0xFFFF5BAE),
-                    size: compact ? 20 : 23,
-                  ),
+                  Icon(items[i].icon, color: const Color(0xFFFF5BAE), size: compact ? 20 : 23),
                   const SizedBox(height: 3),
                   FittedBox(
                     fit: BoxFit.scaleDown,
