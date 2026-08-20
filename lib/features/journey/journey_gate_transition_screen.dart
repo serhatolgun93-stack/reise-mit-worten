@@ -43,12 +43,12 @@ class _JourneyGateTransitionScreenState extends State<JourneyGateTransitionScree
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 4300),
+      duration: const Duration(milliseconds: 4700),
     );
-    Future<void>.delayed(const Duration(milliseconds: 850), () {
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
       if (mounted) _controller.forward();
     });
-    _finishTimer = Timer(const Duration(milliseconds: 5650), _finish);
+    _finishTimer = Timer(const Duration(milliseconds: 6200), _finish);
   }
 
   @override
@@ -152,108 +152,145 @@ class _ApprovedGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final landscape = size.width > size.height;
     final p = progress.clamp(0.0, 1.0);
-    final fade = (1 - ((p - .92) / .08).clamp(0.0, 1.0)).toDouble();
-    final angle = p * (math.pi / 2.05);
-    final glowIn = ((p - .04) / .12).clamp(0.0, 1.0);
-    final glowOut = 1 - ((p - .30) / .20).clamp(0.0, 1.0);
+    final fade = (1 - ((p - .94) / .06).clamp(0.0, 1.0)).toDouble();
+    final angle = p * (math.pi / 2.12);
+    final glowIn = ((p - .03) / .10).clamp(0.0, 1.0);
+    final glowOut = 1 - ((p - .30) / .18).clamp(0.0, 1.0);
     final glow = (glowIn * glowOut).toDouble();
 
     return Opacity(
       opacity: fade,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/journey_gate.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-          ),
-          LayoutBuilder(
-            builder: (context, c) {
-              final w = c.maxWidth;
-              final h = c.maxHeight;
-              // Keep the door area proportional in portrait and landscape.
-              final doorW = landscape ? math.min(w * .55, h * .92) : w * .76;
-              final doorH = landscape ? h * .78 : h * .62;
-              final left = (w - doorW) / 2;
-              final top = landscape ? h * .14 : h * .30;
-              final leafW = doorW / 2;
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final w = c.maxWidth;
+          final h = c.maxHeight;
+          final landscape = w > h;
 
-              Widget leaf(bool leftLeaf) {
-                return ClipRect(
-                  child: Align(
-                    alignment: leftLeaf ? Alignment.centerLeft : Alignment.centerRight,
-                    widthFactor: .5,
-                    child: Image.asset(
-                      'assets/journey_gate.png',
-                      width: doorW,
-                      height: doorH,
-                      fit: BoxFit.fill,
-                      alignment: Alignment.center,
-                    ),
-                  ),
-                );
-              }
+          // journey_gate.png is the fixed architectural portal. Only the actual
+          // blue doorway is duplicated and animated; the arch, flowers, lamps
+          // and sign never rotate with the doors.
+          final doorW = landscape ? math.min(w * .43, h * .78) : w * .72;
+          final doorH = landscape ? h * .69 : h * .59;
+          final doorLeft = (w - doorW) / 2;
+          final doorTop = landscape ? h * .245 : h * .355;
+          final leafW = doorW / 2;
 
-              return Stack(
-                children: [
-                  Positioned(
-                    left: left,
-                    top: top,
-                    width: leafW,
+          Widget gateImage({BoxFit fit = BoxFit.cover}) => Image.asset(
+                'assets/journey_gate.png',
+                width: w,
+                height: h,
+                fit: fit,
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.high,
+              );
+
+          Widget doorLeaf(bool leftLeaf) {
+            return ClipRect(
+              child: SizedBox(
+                width: leafW,
+                height: doorH,
+                child: FittedBox(
+                  fit: BoxFit.fill,
+                  alignment: leftLeaf ? Alignment.centerLeft : Alignment.centerRight,
+                  child: SizedBox(
+                    width: doorW,
                     height: doorH,
-                    child: Transform(
-                      alignment: Alignment.centerLeft,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, .0015)
-                        ..rotateY(-angle),
-                      child: leaf(true),
-                    ),
-                  ),
-                  Positioned(
-                    left: left + leafW,
-                    top: top,
-                    width: leafW,
-                    height: doorH,
-                    child: Transform(
-                      alignment: Alignment.centerRight,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, .0015)
-                        ..rotateY(angle),
-                      child: leaf(false),
-                    ),
-                  ),
-                  if (glow > 0)
-                    Positioned(
-                      left: w / 2 - 1.5,
-                      top: top + doorH * .05,
-                      width: 3,
-                      height: doorH * .90,
-                      child: Opacity(
-                        opacity: glow,
-                        child: const DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFF4FA5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xDDFF2E9A),
-                                blurRadius: 18,
-                                spreadRadius: 5,
-                              ),
-                            ],
-                          ),
+                    child: ClipRect(
+                      child: Align(
+                        alignment: leftLeaf ? Alignment.centerLeft : Alignment.centerRight,
+                        widthFactor: .5,
+                        child: Image.asset(
+                          'assets/journey_gate.png',
+                          width: doorW,
+                          height: doorH,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                          filterQuality: FilterQuality.high,
                         ),
                       ),
                     ),
-                ],
-              );
-            },
-          ),
-        ],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              // Fixed full-screen portal. It remains intact throughout the animation.
+              gateImage(),
+
+              // Destination is revealed only inside the doorway as the leaves open.
+              Positioned(
+                left: doorLeft,
+                top: doorTop,
+                width: doorW,
+                height: doorH,
+                child: ClipRect(
+                  child: Image.asset(
+                    context.findAncestorStateOfType<_JourneyGateTransitionScreenState>()?._destinationAsset ??
+                        'assets/backgrounds/gate_greek.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: doorLeft,
+                top: doorTop,
+                width: leafW,
+                height: doorH,
+                child: Transform(
+                  alignment: Alignment.centerLeft,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, .0016)
+                    ..rotateY(-angle),
+                  child: doorLeaf(true),
+                ),
+              ),
+              Positioned(
+                left: doorLeft + leafW,
+                top: doorTop,
+                width: leafW,
+                height: doorH,
+                child: Transform(
+                  alignment: Alignment.centerRight,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, .0016)
+                    ..rotateY(angle),
+                  child: doorLeaf(false),
+                ),
+              ),
+
+              // Short light slit: exactly limited to the doorway, never into the sign/arch.
+              if (glow > 0)
+                Positioned(
+                  left: w / 2 - 1.5,
+                  top: doorTop + doorH * .035,
+                  width: 3,
+                  height: doorH * .93,
+                  child: Opacity(
+                    opacity: glow,
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF4FA5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xDDFF2E9A),
+                            blurRadius: 16,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
