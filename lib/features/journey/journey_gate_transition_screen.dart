@@ -38,6 +38,17 @@ class _JourneyGateTransitionScreenState
     'assets/gate_5.png',
   ];
 
+  // Remove only the numbered/explanatory heading from each supplied image.
+  // The actual gate sign "REISE MIT WORTEN – Deine Reise beginnt jetzt."
+  // remains part of the scene.
+  static const _topCrop = <double>[
+    .105,
+    .105,
+    .100,
+    .100,
+    .170,
+  ];
+
   late final AnimationController _controller;
   Timer? _finishTimer;
 
@@ -106,12 +117,14 @@ class _JourneyGateTransitionScreenState
             children: [
               _GateFrame(
                 asset: _frames[frame],
+                topCropFraction: _topCrop[frame],
                 opacity: 1,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
                 _GateFrame(
                   asset: _frames[next],
+                  topCropFraction: _topCrop[next],
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
                 ),
@@ -148,11 +161,13 @@ class _JourneyGateTransitionScreenState
 
 class _GateFrame extends StatelessWidget {
   final String asset;
+  final double topCropFraction;
   final double opacity;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
+    required this.topCropFraction,
     required this.opacity,
     required this.fallbackAsset,
   });
@@ -163,13 +178,6 @@ class _GateFrame extends StatelessWidget {
       opacity: opacity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final portrait = constraints.maxHeight >= constraints.maxWidth;
-
-          // The source PNGs contain the explanatory heading above the gate.
-          // Push that part outside the viewport and show only the actual gate
-          // scene. Portrait keeps more vertical scene; landscape crops tighter.
-          final topCropFraction = portrait ? 0.205 : 0.225;
-
           return ClipRect(
             child: FractionalTranslation(
               translation: Offset(0, -topCropFraction),
@@ -184,6 +192,7 @@ class _GateFrame extends StatelessWidget {
                   errorBuilder: (_, __, ___) => Image.asset(
                     fallbackAsset,
                     fit: BoxFit.cover,
+                    alignment: Alignment.center,
                   ),
                 ),
               ),
