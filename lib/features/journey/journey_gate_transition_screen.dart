@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -99,45 +100,6 @@ class _JourneyGateTransitionScreenState
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
                 ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
-                  child: Column(
-                    children: [
-                      const Spacer(),
-                      AnimatedOpacity(
-                        opacity: p > .88 ? 0 : 1,
-                        duration: const Duration(milliseconds: 250),
-                        child: Container(
-                          constraints: const BoxConstraints(maxWidth: 620),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xC9141217),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: const Color(0x55FFFFFF)),
-                          ),
-                          child: Text(
-                            p < .20
-                                ? 'Deine Reise beginnt, ${widget.name}.'
-                                : p < .82
-                                    ? 'Das Tor zu deiner neuen Sprache öffnet sich …'
-                                    : 'Deine Reise startet.',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           );
         },
@@ -180,13 +142,13 @@ class _ReferenceStoryboardFrame extends StatelessWidget {
     required this.fallbackAsset,
   });
 
-  static const _sourceWidth = 1536.0;
-  static const _sourceHeight = 1024.0;
-  static const _cropTop = 70.0;
-  static const _cropHeight = 395.0;
+  static const double _sourceWidth = 1536;
+  static const double _sourceHeight = 1024;
+  static const double _cropTop = 68;
+  static const double _cropHeight = 400;
 
-  static const List<double> _cropLeft = [0, 318, 630, 942, 1232];
-  static const List<double> _cropWidth = [270, 270, 270, 270, 304];
+  static const List<double> _cropLeft = [0, 307, 615, 922, 1229];
+  static const List<double> _cropWidth = [307, 308, 307, 307, 307];
 
   @override
   Widget build(BuildContext context) {
@@ -199,31 +161,42 @@ class _ReferenceStoryboardFrame extends StatelessWidget {
         builder: (context, constraints) {
           final targetW = constraints.maxWidth;
           final targetH = constraints.maxHeight;
-          final scaleX = targetW / cropWidth;
-          final scaleY = targetH / _cropHeight;
+
+          // Scale the selected reference panel uniformly so one single stage
+          // fills the device. Never stretch X/Y independently and never let
+          // neighbouring storyboard panels enter the viewport.
+          final scale = math.max(targetW / cropWidth, targetH / _cropHeight);
+          final scaledCropW = cropWidth * scale;
+          final scaledCropH = _cropHeight * scale;
+          final extraX = (scaledCropW - targetW) / 2;
+          final extraY = (scaledCropH - targetH) / 2;
+
+          final imageW = _sourceWidth * scale;
+          final imageH = _sourceHeight * scale;
+          final dx = -(cropLeft * scale) - extraX;
+          final dy = -(_cropTop * scale) - extraY;
 
           return ClipRect(
-            child: Transform.scale(
-              scaleX: scaleX,
-              scaleY: scaleY,
+            child: OverflowBox(
               alignment: Alignment.topLeft,
+              minWidth: imageW,
+              maxWidth: imageW,
+              minHeight: imageH,
+              maxHeight: imageH,
               child: Transform.translate(
-                offset: Offset(-cropLeft, -_cropTop),
-                child: SizedBox(
-                  width: _sourceWidth,
-                  height: _sourceHeight,
-                  child: Image.asset(
-                    'assets/gate_refence.png',
-                    width: _sourceWidth,
-                    height: _sourceHeight,
-                    fit: BoxFit.fill,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      fallbackAsset,
-                      width: _sourceWidth,
-                      height: _sourceHeight,
-                      fit: BoxFit.cover,
-                    ),
+                offset: Offset(dx, dy),
+                child: Image.asset(
+                  'assets/gate_refence.png',
+                  width: imageW,
+                  height: imageH,
+                  fit: BoxFit.fill,
+                  alignment: Alignment.topLeft,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    fallbackAsset,
+                    width: targetW,
+                    height: targetH,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
