@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -31,6 +30,14 @@ class JourneyGateTransitionScreen extends StatefulWidget {
 class _JourneyGateTransitionScreenState
     extends State<JourneyGateTransitionScreen>
     with SingleTickerProviderStateMixin {
+  static const _frames = <String>[
+    'assets/gate_1.png',
+    'assets/gate_2.png',
+    'assets/gate_3.png',
+    'assets/gate_4.png',
+    'assets/gate_5.png',
+  ];
+
   late final AnimationController _controller;
   Timer? _finishTimer;
 
@@ -39,12 +46,20 @@ class _JourneyGateTransitionScreenState
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 5200),
+      duration: const Duration(milliseconds: 5600),
     );
-    Future<void>.delayed(const Duration(milliseconds: 650), () {
+    Future<void>.delayed(const Duration(milliseconds: 700), () {
       if (mounted) _controller.forward();
     });
-    _finishTimer = Timer(const Duration(milliseconds: 6400), _finish);
+    _finishTimer = Timer(const Duration(milliseconds: 6800), _finish);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    for (final asset in _frames) {
+      precacheImage(AssetImage(asset), context);
+    }
   }
 
   @override
@@ -83,20 +98,20 @@ class _JourneyGateTransitionScreenState
         builder: (context, _) {
           final p = _controller.value;
           final frame = _frameFor(p);
-          final next = frame < 4 ? frame + 1 : frame;
+          final next = frame < _frames.length - 1 ? frame + 1 : frame;
           final blend = _blendFor(p, frame);
 
           return Stack(
             fit: StackFit.expand,
             children: [
-              _ReferenceStoryboardFrame(
-                frame: frame,
+              _GateFrame(
+                asset: _frames[frame],
                 opacity: 1,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
-                _ReferenceStoryboardFrame(
-                  frame: next,
+                _GateFrame(
+                  asset: _frames[next],
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
                 ),
@@ -108,8 +123,8 @@ class _JourneyGateTransitionScreenState
   }
 
   int _frameFor(double p) {
-    if (p < .18) return 0;
-    if (p < .38) return 1;
+    if (p < .20) return 0;
+    if (p < .40) return 1;
     if (p < .62) return 2;
     if (p < .82) return 3;
     return 4;
@@ -118,84 +133,56 @@ class _JourneyGateTransitionScreenState
   double _blendFor(double p, int frame) {
     switch (frame) {
       case 0:
-        return ((p - .12) / .06).clamp(0.0, 1.0);
+        return ((p - .15) / .05).clamp(0.0, 1.0);
       case 1:
-        return ((p - .32) / .06).clamp(0.0, 1.0);
+        return ((p - .35) / .05).clamp(0.0, 1.0);
       case 2:
-        return ((p - .56) / .06).clamp(0.0, 1.0);
+        return ((p - .57) / .05).clamp(0.0, 1.0);
       case 3:
-        return ((p - .76) / .06).clamp(0.0, 1.0);
+        return ((p - .77) / .05).clamp(0.0, 1.0);
       default:
         return 0;
     }
   }
 }
 
-class _ReferenceStoryboardFrame extends StatelessWidget {
-  final int frame;
+class _GateFrame extends StatelessWidget {
+  final String asset;
   final double opacity;
   final String fallbackAsset;
 
-  const _ReferenceStoryboardFrame({
-    required this.frame,
+  const _GateFrame({
+    required this.asset,
     required this.opacity,
     required this.fallbackAsset,
   });
 
-  static const double _sourceWidth = 1536;
-  static const double _sourceHeight = 1024;
-  static const double _cropTop = 68;
-  static const double _cropHeight = 400;
-
-  static const List<double> _cropLeft = [0, 307, 615, 922, 1229];
-  static const List<double> _cropWidth = [307, 308, 307, 307, 307];
-
   @override
   Widget build(BuildContext context) {
-    final cropLeft = _cropLeft[frame];
-    final cropWidth = _cropWidth[frame];
-
     return Opacity(
       opacity: opacity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final targetW = constraints.maxWidth;
-          final targetH = constraints.maxHeight;
+          final portrait = constraints.maxHeight >= constraints.maxWidth;
 
-          // Scale the selected reference panel uniformly so one single stage
-          // fills the device. Never stretch X/Y independently and never let
-          // neighbouring storyboard panels enter the viewport.
-          final scale = math.max(targetW / cropWidth, targetH / _cropHeight);
-          final scaledCropW = cropWidth * scale;
-          final scaledCropH = _cropHeight * scale;
-          final extraX = (scaledCropW - targetW) / 2;
-          final extraY = (scaledCropH - targetH) / 2;
-
-          final imageW = _sourceWidth * scale;
-          final imageH = _sourceHeight * scale;
-          final dx = -(cropLeft * scale) - extraX;
-          final dy = -(_cropTop * scale) - extraY;
+          // The source PNGs contain the explanatory heading above the gate.
+          // Push that part outside the viewport and show only the actual gate
+          // scene. Portrait keeps more vertical scene; landscape crops tighter.
+          final topCropFraction = portrait ? 0.205 : 0.225;
 
           return ClipRect(
-            child: OverflowBox(
-              alignment: Alignment.topLeft,
-              minWidth: imageW,
-              maxWidth: imageW,
-              minHeight: imageH,
-              maxHeight: imageH,
-              child: Transform.translate(
-                offset: Offset(dx, dy),
+            child: FractionalTranslation(
+              translation: Offset(0, -topCropFraction),
+              child: SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight / (1 - topCropFraction),
                 child: Image.asset(
-                  'assets/gate_refence.png',
-                  width: imageW,
-                  height: imageH,
-                  fit: BoxFit.fill,
-                  alignment: Alignment.topLeft,
+                  asset,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                   filterQuality: FilterQuality.high,
                   errorBuilder: (_, __, ___) => Image.asset(
                     fallbackAsset,
-                    width: targetW,
-                    height: targetH,
                     fit: BoxFit.cover,
                   ),
                 ),
