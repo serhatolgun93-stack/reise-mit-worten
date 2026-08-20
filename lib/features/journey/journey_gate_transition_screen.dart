@@ -185,21 +185,8 @@ class _ReferenceStoryboardFrame extends StatelessWidget {
   static const _cropTop = 70.0;
   static const _cropHeight = 395.0;
 
-  static const List<double> _cropLeft = [
-    0,
-    318,
-    630,
-    942,
-    1232,
-  ];
-
-  static const List<double> _cropWidth = [
-    270,
-    270,
-    270,
-    270,
-    304,
-  ];
+  static const List<double> _cropLeft = [0, 318, 630, 942, 1232];
+  static const List<double> _cropWidth = [270, 270, 270, 270, 304];
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +213,7 @@ class _ReferenceStoryboardFrame extends StatelessWidget {
                   width: _sourceWidth,
                   height: _sourceHeight,
                   child: Image.asset(
-                    'assets/gate_reference.png',
+                    'assets/gate_refence.png',
                     width: _sourceWidth,
                     height: _sourceHeight,
                     fit: BoxFit.fill,
