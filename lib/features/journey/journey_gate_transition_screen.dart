@@ -193,16 +193,22 @@ class _GateFrame extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (isLandscape) {
-            return SizedBox.expand(
-              child: Image.asset(
-                asset,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                filterQuality: FilterQuality.high,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  fallbackAsset,
-                  fit: BoxFit.cover,
+            // The supplied landscape artwork is not as wide as every phone.
+            // Contain is intentional: show all four edges without cropping.
+            // Any remaining side space is letterboxed instead of stretching.
+            return ColoredBox(
+              color: Colors.black,
+              child: Center(
+                child: Image.asset(
+                  asset,
+                  fit: BoxFit.contain,
                   alignment: Alignment.center,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    fallbackAsset,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                  ),
                 ),
               ),
             );
