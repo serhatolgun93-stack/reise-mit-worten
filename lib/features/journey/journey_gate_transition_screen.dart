@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -184,18 +185,40 @@ class _GateFrame extends StatelessWidget {
           // the gate between animation frames.
           final isLandscape = constraints.maxWidth > constraints.maxHeight;
           if (isLandscape) {
-            return SizedBox.expand(
-              child: Image.asset(
-                asset,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-                filterQuality: FilterQuality.high,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  fallbackAsset,
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                // A fixed, softly blurred extension fills the landscape sides
+                // without stretching the gate or changing between frames.
+                ClipRect(
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                    child: Image.asset(
+                      _JourneyGateTransitionScreenState._frames.first,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        fallbackAsset,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                const ColoredBox(color: Color(0x88000000)),
+                // Preserve the complete artwork at a stable size and position
+                // for every stage of the gate-opening animation.
+                Image.asset(
+                  asset,
                   fit: BoxFit.contain,
                   alignment: Alignment.center,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    fallbackAsset,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                  ),
                 ),
-              ),
+              ],
             );
           }
 
