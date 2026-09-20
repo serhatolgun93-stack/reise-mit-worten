@@ -38,6 +38,14 @@ class _JourneyGateTransitionScreenState
     'assets/gate_5.png',
   ];
 
+  static const _landscapeFrames = <String>[
+    'assets/gate_landscape_1.png',
+    'assets/gate_landscape_2.png',
+    'assets/gate_landscape_3.png',
+    'assets/gate_landscape_4.png',
+    'assets/gate_landscape_5.png',
+  ];
+
   // Remove only the numbered/explanatory heading from each supplied image.
   // The actual gate sign "REISE MIT WORTEN – Deine Reise beginnt jetzt."
   // remains part of the scene.
@@ -68,7 +76,7 @@ class _JourneyGateTransitionScreenState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (final asset in _frames) {
+    for (final asset in [..._frames, ..._landscapeFrames]) {
       precacheImage(AssetImage(asset), context);
     }
   }
@@ -107,24 +115,28 @@ class _JourneyGateTransitionScreenState
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
+          final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+          final frames = isLandscape ? _landscapeFrames : _frames;
           final p = _controller.value;
           final frame = _frameFor(p);
-          final next = frame < _frames.length - 1 ? frame + 1 : frame;
+          final next = frame < frames.length - 1 ? frame + 1 : frame;
           final blend = _blendFor(p, frame);
 
           return Stack(
             fit: StackFit.expand,
             children: [
               _GateFrame(
-                asset: _frames[frame],
-                topCropFraction: _topCrop[frame],
+                asset: frames[frame],
+                topCropFraction: isLandscape ? 0 : _topCrop[frame],
+                isLandscape: isLandscape,
                 opacity: 1,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
                 _GateFrame(
-                  asset: _frames[next],
-                  topCropFraction: _topCrop[next],
+                  asset: frames[next],
+                  topCropFraction: isLandscape ? 0 : _topCrop[next],
+                  isLandscape: isLandscape,
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
                 ),
@@ -162,12 +174,14 @@ class _JourneyGateTransitionScreenState
 class _GateFrame extends StatelessWidget {
   final String asset;
   final double topCropFraction;
+  final bool isLandscape;
   final double opacity;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
     required this.topCropFraction,
+    required this.isLandscape,
     required this.opacity,
     required this.fallbackAsset,
   });
@@ -178,6 +192,21 @@ class _GateFrame extends StatelessWidget {
       opacity: opacity,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          if (isLandscape) {
+            return SizedBox.expand(
+              child: Image.asset(
+                asset,
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  fallbackAsset,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                ),
+              ),
+            );
+          }
           return ClipRect(
             child: FractionalTranslation(
               translation: Offset(0, -topCropFraction),
