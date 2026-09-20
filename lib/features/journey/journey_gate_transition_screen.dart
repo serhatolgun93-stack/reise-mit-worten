@@ -178,6 +178,27 @@ class _GateFrame extends StatelessWidget {
       opacity: opacity,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          // Keep the approved portrait presentation unchanged. In landscape,
+          // show each complete gate frame inside the same centered viewport:
+          // cover + per-frame cropping previously clipped headings and shifted
+          // the gate between animation frames.
+          final isLandscape = constraints.maxWidth > constraints.maxHeight;
+          if (isLandscape) {
+            return SizedBox.expand(
+              child: Image.asset(
+                asset,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  fallbackAsset,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
+              ),
+            );
+          }
+
           return ClipRect(
             child: FractionalTranslation(
               translation: Offset(0, -topCropFraction),
