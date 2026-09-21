@@ -30,12 +30,12 @@ class JourneyGateTransitionScreen extends StatefulWidget {
 class _JourneyGateTransitionScreenState
     extends State<JourneyGateTransitionScreen>
     with SingleTickerProviderStateMixin {
-  static const _frames = <String>[
-    'assets/gate_1.png',
-    'assets/gate_2.png',
-    'assets/gate_3.png',
-    'assets/gate_4.png',
-    'assets/gate_5.png',
+  static const _portraitFrames = <String>[
+    'assets/gate_portrait_1.png',
+    'assets/gate_portrait_2.png',
+    'assets/gate_portrait_3.png',
+    'assets/gate_portrait_4.png',
+    'assets/gate_portrait_5.png',
   ];
 
   static const _landscapeFrames = <String>[
@@ -46,16 +46,6 @@ class _JourneyGateTransitionScreenState
     'assets/gate_landscape_5.png',
   ];
 
-  // Remove only the numbered/explanatory heading from each supplied image.
-  // The actual gate sign "REISE MIT WORTEN – Deine Reise beginnt jetzt."
-  // remains part of the scene.
-  static const _topCrop = <double>[
-    .105,
-    .105,
-    .100,
-    .100,
-    .170,
-  ];
 
   late final AnimationController _controller;
   Timer? _finishTimer;
@@ -76,7 +66,7 @@ class _JourneyGateTransitionScreenState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (final asset in [..._frames, ..._landscapeFrames]) {
+    for (final asset in [..._portraitFrames, ..._landscapeFrames]) {
       precacheImage(AssetImage(asset), context);
     }
   }
@@ -116,7 +106,7 @@ class _JourneyGateTransitionScreenState
         animation: _controller,
         builder: (context, _) {
           final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-          final frames = isLandscape ? _landscapeFrames : _frames;
+          final frames = isLandscape ? _landscapeFrames : _portraitFrames;
           final p = _controller.value;
           final frame = _frameFor(p);
           final next = frame < frames.length - 1 ? frame + 1 : frame;
@@ -127,7 +117,6 @@ class _JourneyGateTransitionScreenState
             children: [
               _GateFrame(
                 asset: frames[frame],
-                topCropFraction: isLandscape ? 0 : _topCrop[frame],
                 isLandscape: isLandscape,
                 opacity: 1,
                 fallbackAsset: widget.backgroundAsset,
@@ -135,7 +124,6 @@ class _JourneyGateTransitionScreenState
               if (next != frame)
                 _GateFrame(
                   asset: frames[next],
-                  topCropFraction: isLandscape ? 0 : _topCrop[next],
                   isLandscape: isLandscape,
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
@@ -173,14 +161,12 @@ class _JourneyGateTransitionScreenState
 
 class _GateFrame extends StatelessWidget {
   final String asset;
-  final double topCropFraction;
   final bool isLandscape;
   final double opacity;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
-    required this.topCropFraction,
     required this.isLandscape,
     required this.opacity,
     required this.fallbackAsset,
@@ -190,50 +176,18 @@ class _GateFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Opacity(
       opacity: opacity,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (isLandscape) {
-            // The supplied landscape artwork is not as wide as every phone.
-            // Contain is intentional: show all four edges without cropping.
-            // Any remaining side space is letterboxed instead of stretching.
-            return ColoredBox(
-              color: Colors.black,
-              child: Center(
-                child: Image.asset(
-                  asset,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.center,
-                  filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    fallbackAsset,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
-            );
-          }
-          return ClipRect(
-            child: FractionalTranslation(
-              translation: Offset(0, -topCropFraction),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight / (1 - topCropFraction),
-                child: Image.asset(
-                  asset,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    fallbackAsset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+      child: SizedBox.expand(
+        child: Image.asset(
+          asset,
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => Image.asset(
+            fallbackAsset,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
+        ),
       ),
     );
   }
