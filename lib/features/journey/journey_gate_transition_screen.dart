@@ -186,7 +186,7 @@ class _GateFrame extends StatelessWidget {
     // Portrait frames 1-4 were authored with slightly different framing.
     // Keep the architectural gate anchored while the doors open.
     const portraitAlignment = <Alignment>[
-      Alignment(0.0, -0.01),
+      Alignment(0.0, 0.01),
       Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
@@ -199,19 +199,41 @@ class _GateFrame extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: SizedBox.expand(
-        child: Image.asset(
-          asset,
-          // Both asset sets are authored for their respective orientation.
-          // Cover guarantees edge-to-edge rendering without black letterboxing.
-          fit: BoxFit.cover,
-          alignment: alignment,
-          filterQuality: FilterQuality.high,
-          errorBuilder: (_, __, ___) => Image.asset(
-            fallbackAsset,
-            fit: BoxFit.cover,
-            alignment: alignment,
-          ),
-        ),
+        child: isLandscape
+            ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Fill every physical pixel so there are no black bars.
+                  Image.asset(
+                    asset,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                    filterQuality: FilterQuality.high,
+                  ),
+                  // Keep the complete landscape artwork visible; no top/bottom crop.
+                  Image.asset(
+                    asset,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    filterQuality: FilterQuality.high,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      fallbackAsset,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )
+            : Image.asset(
+                asset,
+                fit: BoxFit.cover,
+                alignment: alignment,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  fallbackAsset,
+                  fit: BoxFit.cover,
+                  alignment: alignment,
+                ),
+              ),
       ),
     );
   }
