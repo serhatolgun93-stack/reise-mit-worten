@@ -199,41 +199,17 @@ class _GateFrame extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: SizedBox.expand(
-        child: isLandscape
-            ? Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Fill every physical pixel so there are no black bars.
-                  Image.asset(
-                    asset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    filterQuality: FilterQuality.high,
-                  ),
-                  // Keep the complete landscape artwork visible; no top/bottom crop.
-                  Image.asset(
-                    asset,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      fallbackAsset,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
-              )
-            : Image.asset(
-                asset,
-                fit: BoxFit.cover,
-                alignment: alignment,
-                filterQuality: FilterQuality.high,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  fallbackAsset,
-                  fit: BoxFit.cover,
-                  alignment: alignment,
-                ),
-              ),
+        child: Image.asset(
+          asset,
+          fit: BoxFit.cover,
+          alignment: alignment,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => Image.asset(
+            fallbackAsset,
+            fit: BoxFit.cover,
+            alignment: alignment,
+          ),
+        ),
       ),
     );
   }
