@@ -119,6 +119,7 @@ class _JourneyGateTransitionScreenState
                 asset: frames[frame],
                 isLandscape: isLandscape,
                 opacity: 1,
+                frameIndex: frame,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
@@ -126,6 +127,7 @@ class _JourneyGateTransitionScreenState
                   asset: frames[next],
                   isLandscape: isLandscape,
                   opacity: blend,
+                  frameIndex: next,
                   fallbackAsset: widget.backgroundAsset,
                 ),
             ],
@@ -163,29 +165,46 @@ class _GateFrame extends StatelessWidget {
   final String asset;
   final bool isLandscape;
   final double opacity;
+  final int frameIndex;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
     required this.isLandscape,
     required this.opacity,
+    required this.frameIndex,
     required this.fallbackAsset,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Portrait frames 1-4 were authored with slightly different framing.
+    // Keep the architectural gate anchored while the doors open.
+    const portraitAlignment = <Alignment>[
+      Alignment(0.0, -0.03),
+      Alignment(0.0, -0.01),
+      Alignment(0.0, -0.01),
+      Alignment(0.0, -0.01),
+      Alignment.center,
+    ];
+
+    final alignment =
+        isLandscape ? Alignment.center : portraitAlignment[frameIndex];
+
     return Opacity(
       opacity: opacity,
       child: SizedBox.expand(
         child: Image.asset(
           asset,
+          // Both asset sets are authored for their respective orientation.
+          // Cover guarantees edge-to-edge rendering without black letterboxing.
           fit: BoxFit.cover,
-          alignment: Alignment.center,
+          alignment: alignment,
           filterQuality: FilterQuality.high,
           errorBuilder: (_, __, ___) => Image.asset(
             fallbackAsset,
             fit: BoxFit.cover,
-            alignment: Alignment.center,
+            alignment: alignment,
           ),
         ),
       ),
