@@ -44,7 +44,6 @@ class _JourneyGateTransitionScreenState
     'assets/gate_landscape_2.png',
     'assets/gate_landscape_3.png',
     'assets/gate_landscape_4.png',
-    'assets/gate_landscape_5.png',
   ];
 
 
@@ -113,9 +112,9 @@ class _JourneyGateTransitionScreenState
           final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
           final frames = isLandscape ? _landscapeFrames : _portraitFrames;
           final p = _controller.value;
-          final frame = _frameFor(p);
+          final frame = _frameFor(p, frames.length);
           final next = frame < frames.length - 1 ? frame + 1 : frame;
-          final blend = _blendFor(p, frame);
+          final blend = _blendFor(p, frame, frames.length);
 
           return Stack(
             fit: StackFit.expand,
@@ -142,7 +141,13 @@ class _JourneyGateTransitionScreenState
     );
   }
 
-  int _frameFor(double p) {
+  int _frameFor(double p, int frameCount) {
+    if (frameCount == 4) {
+      if (p < .27) return 0;
+      if (p < .53) return 1;
+      if (p < .79) return 2;
+      return 3;
+    }
     if (p < .20) return 0;
     if (p < .40) return 1;
     if (p < .62) return 2;
@@ -150,7 +155,19 @@ class _JourneyGateTransitionScreenState
     return 4;
   }
 
-  double _blendFor(double p, int frame) {
+  double _blendFor(double p, int frame, int frameCount) {
+    if (frameCount == 4) {
+      switch (frame) {
+        case 0:
+          return ((p - .22) / .05).clamp(0.0, 1.0);
+        case 1:
+          return ((p - .48) / .05).clamp(0.0, 1.0);
+        case 2:
+          return ((p - .74) / .05).clamp(0.0, 1.0);
+        default:
+          return 0;
+      }
+    }
     switch (frame) {
       case 0:
         return ((p - .15) / .05).clamp(0.0, 1.0);
