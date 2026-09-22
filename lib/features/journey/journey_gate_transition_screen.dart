@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'journey_dashboard_screen.dart';
 
@@ -53,6 +54,9 @@ class _JourneyGateTransitionScreenState
   @override
   void initState() {
     super.initState();
+    // Gate transition is intentionally immersive so landscape artwork can
+    // occupy the physical display instead of stopping before Android nav bars.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 5600),
@@ -75,6 +79,7 @@ class _JourneyGateTransitionScreenState
   void dispose() {
     _finishTimer?.cancel();
     _controller.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -181,7 +186,7 @@ class _GateFrame extends StatelessWidget {
     // Portrait frames 1-4 were authored with slightly different framing.
     // Keep the architectural gate anchored while the doors open.
     const portraitAlignment = <Alignment>[
-      Alignment(0.0, -0.03),
+      Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
