@@ -35,7 +35,6 @@ class _JourneyGateTransitionScreenState
     'assets/gate_portrait_1.png',
     'assets/gate_portrait_2.png',
     'assets/gate_portrait_3.png',
-    'assets/gate_portrait_4.png',
     'assets/gate_portrait_5.png',
   ];
 
@@ -204,7 +203,6 @@ class _GateFrame extends StatelessWidget {
     // Keep the architectural gate anchored while the doors open.
     const portraitAlignment = <Alignment>[
       Alignment(0.0, 0.01),
-      Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
       Alignment(0.0, -0.01),
       Alignment.center,
