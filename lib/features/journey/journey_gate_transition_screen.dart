@@ -35,7 +35,7 @@ class _JourneyGateTransitionScreenState
     'assets/gate_portrait_1.png',
     'assets/gate_portrait_2.png',
     'assets/gate_portrait_3.png',
-    'assets/gate_portrait_5.png',
+    'assets/gate_portrait_4.png',
   ];
 
   static const _landscapeFrames = <String>[
