@@ -149,23 +149,20 @@ class _JourneyGateTransitionScreenState
   }
 
   int _frameFor(double p) {
-    if (p < .20) return 0;
-    if (p < .40) return 1;
-    if (p < .62) return 2;
-    if (p < .82) return 3;
-    return 4;
+    if (p < .27) return 0;
+    if (p < .53) return 1;
+    if (p < .79) return 2;
+    return 3;
   }
 
   double _blendFor(double p, int frame) {
     switch (frame) {
       case 0:
-        return ((p - .15) / .05).clamp(0.0, 1.0);
+        return ((p - .22) / .05).clamp(0.0, 1.0);
       case 1:
-        return ((p - .35) / .05).clamp(0.0, 1.0);
+        return ((p - .48) / .05).clamp(0.0, 1.0);
       case 2:
-        return ((p - .57) / .05).clamp(0.0, 1.0);
-      case 3:
-        return ((p - .77) / .05).clamp(0.0, 1.0);
+        return ((p - .74) / .05).clamp(0.0, 1.0);
       default:
         return 0;
     }
