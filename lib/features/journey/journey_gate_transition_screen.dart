@@ -32,7 +32,7 @@ class _JourneyGateTransitionScreenState
     extends State<JourneyGateTransitionScreen>
     with SingleTickerProviderStateMixin {
   // The same gate is used for every language; frames 3 and 4 reveal
-  // the selected destination. Frame 5 is the destination background.
+  // the selected destination. The transition ends after frame 4.
   String get _destination {
     switch (widget.language.trim().toLowerCase()) {
       case 'türkçe':
@@ -55,7 +55,6 @@ class _JourneyGateTransitionScreenState
       'assets/gate_${format}_2.png',
       'assets/gate_${format}_${_destination}_3.png',
       'assets/gate_${format}_${_destination}_4.png',
-      widget.backgroundAsset,
     ];
   }
 
