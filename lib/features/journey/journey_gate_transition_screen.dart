@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'journey_dashboard_screen.dart';
 
@@ -30,24 +31,32 @@ class JourneyGateTransitionScreen extends StatefulWidget {
 class _JourneyGateTransitionScreenState
     extends State<JourneyGateTransitionScreen>
     with SingleTickerProviderStateMixin {
-  static const _frames = <String>[
-    'assets/gate_1.png',
-    'assets/gate_2.png',
-    'assets/gate_3.png',
-    'assets/gate_4.png',
-    'assets/gate_5.png',
-  ];
+  // The same gate is used for every language; frames 3 and 4 reveal
+  // the selected destination. The transition ends after frame 4.
+  String get _destination {
+    switch (widget.language.trim().toLowerCase()) {
+      case 'türkçe':
+      case 'turkish':
+      case 'türkisch':
+        return 'turkish';
+      case 'ελληνικά':
+      case 'greek':
+      case 'griechisch':
+        return 'greek';
+      default:
+        return 'english';
+    }
+  }
 
-  // Remove only the numbered/explanatory heading from each supplied image.
-  // The actual gate sign "REISE MIT WORTEN – Deine Reise beginnt jetzt."
-  // remains part of the scene.
-  static const _topCrop = <double>[
-    .105,
-    .105,
-    .100,
-    .100,
-    .170,
-  ];
+  List<String> _framesFor(bool isLandscape) {
+    final format = isLandscape ? 'landscape' : 'portrait';
+    return <String>[
+      'assets/gate_${format}_1.png',
+      'assets/gate_${format}_2.png',
+      'assets/gate_${format}_${_destination}_3.png',
+      'assets/gate_${format}_${_destination}_4.png',
+    ];
+  }
 
   late final AnimationController _controller;
   Timer? _finishTimer;
@@ -55,6 +64,7 @@ class _JourneyGateTransitionScreenState
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 5600),
@@ -68,7 +78,7 @@ class _JourneyGateTransitionScreenState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (final asset in _frames) {
+    for (final asset in <String>{..._framesFor(false), ..._framesFor(true)}) {
       precacheImage(AssetImage(asset), context);
     }
   }
@@ -77,6 +87,7 @@ class _JourneyGateTransitionScreenState
   void dispose() {
     _finishTimer?.cancel();
     _controller.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -107,24 +118,26 @@ class _JourneyGateTransitionScreenState
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
+          final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+          final frames = _framesFor(isLandscape);
           final p = _controller.value;
           final frame = _frameFor(p);
-          final next = frame < _frames.length - 1 ? frame + 1 : frame;
+          final next = frame < frames.length - 1 ? frame + 1 : frame;
           final blend = _blendFor(p, frame);
 
           return Stack(
             fit: StackFit.expand,
             children: [
               _GateFrame(
-                asset: _frames[frame],
-                topCropFraction: _topCrop[frame],
+                asset: frames[frame],
+                alignment: isLandscape ? Alignment.center : const Alignment(0, -0.01),
                 opacity: 1,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
                 _GateFrame(
-                  asset: _frames[next],
-                  topCropFraction: _topCrop[next],
+                  asset: frames[next],
+                  alignment: isLandscape ? Alignment.center : const Alignment(0, -0.01),
                   opacity: blend,
                   fallbackAsset: widget.backgroundAsset,
                 ),
@@ -136,23 +149,20 @@ class _JourneyGateTransitionScreenState
   }
 
   int _frameFor(double p) {
-    if (p < .20) return 0;
-    if (p < .40) return 1;
-    if (p < .62) return 2;
-    if (p < .82) return 3;
-    return 4;
+    if (p < .27) return 0;
+    if (p < .53) return 1;
+    if (p < .79) return 2;
+    return 3;
   }
 
   double _blendFor(double p, int frame) {
     switch (frame) {
       case 0:
-        return ((p - .15) / .05).clamp(0.0, 1.0);
+        return ((p - .22) / .05).clamp(0.0, 1.0);
       case 1:
-        return ((p - .35) / .05).clamp(0.0, 1.0);
+        return ((p - .48) / .05).clamp(0.0, 1.0);
       case 2:
-        return ((p - .57) / .05).clamp(0.0, 1.0);
-      case 3:
-        return ((p - .77) / .05).clamp(0.0, 1.0);
+        return ((p - .74) / .05).clamp(0.0, 1.0);
       default:
         return 0;
     }
@@ -161,13 +171,13 @@ class _JourneyGateTransitionScreenState
 
 class _GateFrame extends StatelessWidget {
   final String asset;
-  final double topCropFraction;
+  final Alignment alignment;
   final double opacity;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
-    required this.topCropFraction,
+    required this.alignment,
     required this.opacity,
     required this.fallbackAsset,
   });
@@ -176,29 +186,25 @@ class _GateFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Opacity(
       opacity: opacity,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return ClipRect(
-            child: FractionalTranslation(
-              translation: Offset(0, -topCropFraction),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight / (1 - topCropFraction),
-                child: Image.asset(
-                  asset,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    fallbackAsset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+      child: SizedBox.expand(
+        child: Image.asset(
+          asset,
+          fit: MediaQuery.orientationOf(context) == Orientation.landscape &&
+                  asset == 'assets/gate_landscape_turkish_4.png'
+              ? BoxFit.cover
+              : MediaQuery.orientationOf(context) == Orientation.landscape
+                  ? BoxFit.contain
+                  : BoxFit.cover,
+          alignment: alignment,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => Image.asset(
+            fallbackAsset,
+            fit: MediaQuery.orientationOf(context) == Orientation.landscape
+                ? BoxFit.contain
+                : BoxFit.cover,
+            alignment: alignment,
+          ),
+        ),
       ),
     );
   }
