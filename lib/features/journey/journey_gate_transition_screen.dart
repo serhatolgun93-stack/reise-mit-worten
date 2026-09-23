@@ -189,9 +189,12 @@ class _GateFrame extends StatelessWidget {
       child: SizedBox.expand(
         child: Image.asset(
           asset,
-          fit: MediaQuery.orientationOf(context) == Orientation.landscape
-              ? BoxFit.contain
-              : BoxFit.cover,
+          fit: MediaQuery.orientationOf(context) == Orientation.landscape &&
+                  asset == 'assets/gate_landscape_turkish_4.png'
+              ? BoxFit.cover
+              : MediaQuery.orientationOf(context) == Orientation.landscape
+                  ? BoxFit.contain
+                  : BoxFit.cover,
           alignment: alignment,
           filterQuality: FilterQuality.high,
           errorBuilder: (_, __, ___) => Image.asset(
