@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'journey_dashboard_screen.dart';
 
@@ -30,24 +31,20 @@ class JourneyGateTransitionScreen extends StatefulWidget {
 class _JourneyGateTransitionScreenState
     extends State<JourneyGateTransitionScreen>
     with SingleTickerProviderStateMixin {
-  static const _frames = <String>[
-    'assets/gate_1.png',
-    'assets/gate_2.png',
-    'assets/gate_3.png',
-    'assets/gate_4.png',
-    'assets/gate_5.png',
+  static const _portraitFrames = <String>[
+    'assets/gate_portrait_1.png',
+    'assets/gate_portrait_2.png',
+    'assets/gate_portrait_3.png',
+    'assets/gate_portrait_5.png',
   ];
 
-  // Remove only the numbered/explanatory heading from each supplied image.
-  // The actual gate sign "REISE MIT WORTEN – Deine Reise beginnt jetzt."
-  // remains part of the scene.
-  static const _topCrop = <double>[
-    .105,
-    .105,
-    .100,
-    .100,
-    .170,
+  static const _landscapeFrames = <String>[
+    'assets/gate_landscape_1.png',
+    'assets/gate_landscape_2.png',
+    'assets/gate_landscape_3.png',
+    'assets/gate_landscape_4.png',
   ];
+
 
   late final AnimationController _controller;
   Timer? _finishTimer;
@@ -55,6 +52,9 @@ class _JourneyGateTransitionScreenState
   @override
   void initState() {
     super.initState();
+    // Gate transition is intentionally immersive so landscape artwork can
+    // occupy the physical display instead of stopping before Android nav bars.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 5600),
@@ -68,7 +68,7 @@ class _JourneyGateTransitionScreenState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    for (final asset in _frames) {
+    for (final asset in [..._portraitFrames, ..._landscapeFrames]) {
       precacheImage(AssetImage(asset), context);
     }
   }
@@ -77,6 +77,7 @@ class _JourneyGateTransitionScreenState
   void dispose() {
     _finishTimer?.cancel();
     _controller.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -107,25 +108,29 @@ class _JourneyGateTransitionScreenState
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
+          final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+          final frames = isLandscape ? _landscapeFrames : _portraitFrames;
           final p = _controller.value;
-          final frame = _frameFor(p);
-          final next = frame < _frames.length - 1 ? frame + 1 : frame;
-          final blend = _blendFor(p, frame);
+          final frame = _frameFor(p, frames.length);
+          final next = frame < frames.length - 1 ? frame + 1 : frame;
+          final blend = _blendFor(p, frame, frames.length);
 
           return Stack(
             fit: StackFit.expand,
             children: [
               _GateFrame(
-                asset: _frames[frame],
-                topCropFraction: _topCrop[frame],
+                asset: frames[frame],
+                isLandscape: isLandscape,
                 opacity: 1,
+                frameIndex: frame,
                 fallbackAsset: widget.backgroundAsset,
               ),
               if (next != frame)
                 _GateFrame(
-                  asset: _frames[next],
-                  topCropFraction: _topCrop[next],
+                  asset: frames[next],
+                  isLandscape: isLandscape,
                   opacity: blend,
+                  frameIndex: next,
                   fallbackAsset: widget.backgroundAsset,
                 ),
             ],
@@ -135,7 +140,13 @@ class _JourneyGateTransitionScreenState
     );
   }
 
-  int _frameFor(double p) {
+  int _frameFor(double p, int frameCount) {
+    if (frameCount == 4) {
+      if (p < .27) return 0;
+      if (p < .53) return 1;
+      if (p < .79) return 2;
+      return 3;
+    }
     if (p < .20) return 0;
     if (p < .40) return 1;
     if (p < .62) return 2;
@@ -143,7 +154,19 @@ class _JourneyGateTransitionScreenState
     return 4;
   }
 
-  double _blendFor(double p, int frame) {
+  double _blendFor(double p, int frame, int frameCount) {
+    if (frameCount == 4) {
+      switch (frame) {
+        case 0:
+          return ((p - .22) / .05).clamp(0.0, 1.0);
+        case 1:
+          return ((p - .48) / .05).clamp(0.0, 1.0);
+        case 2:
+          return ((p - .74) / .05).clamp(0.0, 1.0);
+        default:
+          return 0;
+      }
+    }
     switch (frame) {
       case 0:
         return ((p - .15) / .05).clamp(0.0, 1.0);
@@ -161,44 +184,47 @@ class _JourneyGateTransitionScreenState
 
 class _GateFrame extends StatelessWidget {
   final String asset;
-  final double topCropFraction;
+  final bool isLandscape;
   final double opacity;
+  final int frameIndex;
   final String fallbackAsset;
 
   const _GateFrame({
     required this.asset,
-    required this.topCropFraction,
+    required this.isLandscape,
     required this.opacity,
+    required this.frameIndex,
     required this.fallbackAsset,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Portrait frames 1-4 were authored with slightly different framing.
+    // Keep the architectural gate anchored while the doors open.
+    const portraitAlignment = <Alignment>[
+      Alignment(0.0, 0.01),
+      Alignment(0.0, -0.01),
+      Alignment(0.0, -0.01),
+      Alignment.center,
+    ];
+
+    final alignment =
+        isLandscape ? Alignment.center : portraitAlignment[frameIndex];
+
     return Opacity(
       opacity: opacity,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return ClipRect(
-            child: FractionalTranslation(
-              translation: Offset(0, -topCropFraction),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight / (1 - topCropFraction),
-                child: Image.asset(
-                  asset,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    fallbackAsset,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+      child: SizedBox.expand(
+        child: Image.asset(
+          asset,
+          fit: BoxFit.cover,
+          alignment: alignment,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => Image.asset(
+            fallbackAsset,
+            fit: BoxFit.cover,
+            alignment: alignment,
+          ),
+        ),
       ),
     );
   }
